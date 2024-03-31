@@ -6,6 +6,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import { Link } from "react-router-dom";
 import { addItem } from "../redux/reducer/handleCart";
+import "./index.css"
 
 const Products = () => {
   const [data, setData] = useState([]);
@@ -85,7 +86,7 @@ const Products = () => {
         {filter.map((product) => {
           return (
             <div id={product.id} key={product.id} className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4">
-              <div className="card text-center h-100" key={product.id}>
+              <div className="product-card card text-center h-100 bg-light" key={product.id}>
                 <img
                   className="card-img-top p-3"
                   src={product.image}
@@ -101,9 +102,8 @@ const Products = () => {
                   </p>
                 </div>
                 <ul className="list-group list-group-flush">
-                  <li className="list-group-item lead">$ {product.price}</li>
-                  {/* <li className="list-group-item">Dapibus ac facilisis in</li>
-                    <li className="list-group-item">Vestibulum at eros</li> */}
+                  <li className="list-group-item lead fw-bolder">$ {product.price}</li>
+                 
                 </ul>
                 <div className="card-body">
                   <Link to={"/product/" + product.id} className="btn btn-dark m-1">

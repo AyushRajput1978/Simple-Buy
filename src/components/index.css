@@ -1,0 +1,7 @@
+.card-img-top{
+    transition: transform 0.3s ease-in-out;
+}
+.product-card:hover .card-img-top{
+   
+    transform: scale(1.1);
+}
