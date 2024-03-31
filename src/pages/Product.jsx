@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
 
 import { Footer, Navbar } from "../components";
+import { addItem } from "../redux/reducer/handleCart";
 
 const Product = () => {
   const { id } = useParams();
@@ -17,7 +18,7 @@ const Product = () => {
   const dispatch = useDispatch();
 
   const addProduct = (product) => {
-    dispatch(addCart(product));
+    dispatch(addItem(product));
   };
 
   useEffect(() => {

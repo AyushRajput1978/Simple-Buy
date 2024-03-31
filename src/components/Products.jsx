@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { addCart } from "../redux/action";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import { Link } from "react-router-dom";
+import { addItem } from "../redux/reducer/handleCart";
 
 const Products = () => {
   const [data, setData] = useState([]);
@@ -16,7 +16,7 @@ const Products = () => {
   const dispatch = useDispatch();
 
   const addProduct = (product) => {
-    dispatch(addCart(product))
+    dispatch(addItem(product))
   }
 
   useEffect(() => {

@@ -1,9 +1,10 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { NavLink } from 'react-router-dom'
 
 const Navbar = () => {
     const state = useSelector(state => state.handleCart)
+    console.log(state,"state")
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
             <div className="container">

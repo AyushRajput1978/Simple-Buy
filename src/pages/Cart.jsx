@@ -3,6 +3,7 @@ import { Footer, Navbar } from "../components";
 import { useSelector, useDispatch } from "react-redux";
 import { addCart, delCart } from "../redux/action";
 import { Link } from "react-router-dom";
+import { deleteItem } from "../redux/reducer/handleCart";
 
 const Cart = () => {
   const state = useSelector((state) => state.handleCart);
@@ -24,10 +25,10 @@ const Cart = () => {
   };
 
   const addItem = (product) => {
-    dispatch(addCart(product));
+    dispatch(addItem(product));
   };
   const removeItem = (product) => {
-    dispatch(delCart(product));
+    dispatch(deleteItem(product));
   };
 
   const ShowCart = () => {
