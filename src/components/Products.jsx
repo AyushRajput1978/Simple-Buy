@@ -36,6 +36,7 @@ const Products = () => {
   useEffect(() => {
     setFilter(data);
   }, [data]);
+  
   const Loading = () => {
     return (
       <>
