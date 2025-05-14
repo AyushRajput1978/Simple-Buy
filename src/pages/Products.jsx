@@ -1,14 +1,8 @@
-import React from 'react'
-import { Footer, Navbar, Product } from "../components"
+import React from "react";
+import { Product } from "../components";
 
 const Products = () => {
-  return (
-    <>
-      <Navbar />
-      <Product />
-      <Footer />
-    </>
-  )
-}
+  return <Product />;
+};
 
-export default Products
+export default Products;
