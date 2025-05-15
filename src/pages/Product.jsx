@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { Link, useParams } from "react-router-dom";
 import Marquee from "react-fast-marquee";
@@ -7,13 +6,11 @@ import axios from "../axios";
 
 import { addItem } from "../redux/reducer/handleCart";
 import { useQuery } from "@tanstack/react-query";
+import Reviews from "../components/Reviews";
+import RatingStars from "../utils/RatingStars";
 
 const Product = () => {
   const { id } = useParams();
-  // const [product, setProduct] = useState([]);
-  // const [similarProducts, setSimilarProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [loading2, setLoading2] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -21,51 +18,29 @@ const Product = () => {
     dispatch(addItem(product));
   };
 
+  // get products functions
   const getProduct = async ({ queryKey }) => {
     const [_, id] = queryKey;
     const res = await axios(`/products/${id}`);
-    return res.data.data;
+    return res.data.data.data;
   };
   const getSimilarProducts = async ({ queryKey }) => {
     const [_, id] = queryKey;
     const res = await axios(`/products/${id}/similar`);
-    return res.data.data;
+    return res.data.data.similarProducts;
   };
-  const {
-    data: product,
-    isLoading: productLoading,
-    // error: productsError,
-    // refetch: refetchProducts,
-  } = useQuery({
+
+  // useQuery to get the products and cached the result
+  const { data: product, isLoading: productLoading } = useQuery({
     queryKey: ["detailed-product", id],
     queryFn: getProduct,
   });
-  const {
-    data: similarProducts,
-    isLoading: simlarProductLoading,
-    // error: productsError,
-    // refetch: refetchProducts,
-  } = useQuery({
+  const { data: similarProducts, isLoading: simlarProductLoading } = useQuery({
     queryKey: ["similar-product", id],
     queryFn: getSimilarProducts,
   });
-  // useEffect(() => {
-  //   const getProduct = async () => {
-  //     setLoading(true);
-  //     setLoading2(true);
-  //     const response = await axios(`/products/${id}`);
-  //     const data = await response.json();
-  //     setProduct(data);
-  //     setLoading(false);
-  //     const response2 = await axios(`/products/${id}/similar`);
-  //     const data2 = await response2.json();
-  //     setSimilarProducts(data2);
-  //     setLoading2(false);
-  //   };
-  //   getProduct();
-  // }, [id]);
 
-  const Loading = () => {
+  const ProductLoading = () => {
     return (
       <>
         <div className="container my-5 py-2">
@@ -87,7 +62,6 @@ const Product = () => {
       </>
     );
   };
-
   const ShowProduct = () => {
     return (
       <>
@@ -97,18 +71,15 @@ const Product = () => {
               <img
                 className="img-fluid"
                 src={product.image}
-                alt={product.title}
+                alt={product.name}
                 width="400px"
                 height="400px"
               />
             </div>
             <div className="col-md-6 col-md-6 py-5">
               <h4 className="text-uppercase text-muted">{product.category}</h4>
-              <h1 className="display-5">{product.title}</h1>
-              <p className="lead">
-                {product.rating && product.rating.rate}{" "}
-                <i className="fa fa-star"></i>
-              </p>
+              <h1 className="display-5">{product.name}</h1>
+              <RatingStars ratings={product?.ratingsAverage} />
               <h3 className="display-6  my-4">${product.price}</h3>
               <p className="lead">{product.description}</p>
               <button
@@ -127,7 +98,7 @@ const Product = () => {
     );
   };
 
-  const Loading2 = () => {
+  const SimilarProductsLoading = () => {
     return (
       <>
         <div className="my-4 py-4">
@@ -167,12 +138,12 @@ const Product = () => {
                   />
                   <div className="card-body">
                     <h5 className="card-title">
-                      {item.title.substring(0, 15)}...
+                      {item.name.substring(0, 15)}...
                     </h5>
                   </div>
-                  {/* <ul className="list-group list-group-flush">
-                    <li className="list-group-item lead">${product.price}</li>
-                  </ul> */}
+                  <ul className="list-group list-group-flush">
+                    <li className="list-group-item lead">${item.price}</li>
+                  </ul>
                   <div className="card-body">
                     <Link
                       to={"/product/" + item.id}
@@ -195,19 +166,31 @@ const Product = () => {
       </>
     );
   };
+
   return (
     <div className="container">
       <div className="row">
-        {productLoading ? <Loading /> : <ShowProduct />}
+        {productLoading ? <ProductLoading /> : <ShowProduct />}
       </div>
       <div className="row my-5 py-5">
         <div className="d-none d-md-block">
           <h2 className="">You may also Like</h2>
           <Marquee pauseOnHover={true} pauseOnClick={true} speed={50}>
-            {simlarProductLoading ? <Loading2 /> : <ShowSimilarProduct />}
+            {simlarProductLoading ? (
+              <SimilarProductsLoading />
+            ) : (
+              <ShowSimilarProduct />
+            )}
           </Marquee>
         </div>
       </div>
+      {!productLoading && (
+        <Reviews
+          reviews={product?.reviews}
+          reviewsCount={product?.ratingsQuantity}
+          ratingsAverage={product?.ratingsAverage}
+        />
+      )}
     </div>
   );
 };
