@@ -1,30 +1,75 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
+import { useMutation } from "@tanstack/react-query";
+import axios from "../axios";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setAuth } from "../redux/reducer/authSlice";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [form, setForm] = useState({ email: "", password: "" });
+
+  const loginHandler = useMutation({
+    mutationFn: async (formData) => {
+      return axios.post("/users/login", formData);
+    },
+    onSuccess: (res) => {
+      const { user, token } = res.data.data;
+      Cookies.set("JWT", token, {
+        expires: 2,
+        secure: true,
+        sameSite: "Strict",
+      });
+      // Store in Redux
+      dispatch(setAuth({ user }));
+
+      // Role-based redirect
+      if (user.role === "admin" || user.role === "superAdmin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
+    },
+    onError: (err) => {
+      console.error("Login error", err);
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    loginHandler.mutate(form);
+  };
+
   return (
     <div className="container my-3 py-3">
       <h1 className="text-center">Login</h1>
       <hr />
-      <div class="row my-4 h-100">
+      <div className="row my-4 h-100">
         <div className="col-md-4 col-lg-4 col-sm-8 mx-auto">
-          <form>
-            <div class="my-3">
-              <label for="display-4">Email address</label>
+          <form onSubmit={handleSubmit}>
+            <div className="my-3">
+              <label htmlFor="email">Email address</label>
               <input
                 type="email"
-                class="form-control"
-                id="floatingInput"
+                className="form-control"
+                id="email"
                 placeholder="name@example.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
-            <div class="my-3">
-              <label for="floatingPassword display-4">Password</label>
+            <div className="my-3">
+              <label htmlFor="password">Password</label>
               <input
                 type="password"
-                class="form-control"
-                id="floatingPassword"
+                className="form-control"
+                id="password"
                 placeholder="Password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
             </div>
             <div className="my-3">
@@ -35,12 +80,16 @@ const Login = () => {
                   className="text-decoration-underline text-info"
                 >
                   Register
-                </Link>{" "}
+                </Link>
               </p>
             </div>
             <div className="text-center">
-              <button class="my-2 mx-auto btn btn-dark" type="submit" disabled>
-                Login
+              <button
+                className="my-2 mx-auto btn btn-dark"
+                type="submit"
+                disabled={loginHandler.isLoading}
+              >
+                {loginHandler.isLoading ? "Logging in..." : "Login"}
               </button>
             </div>
           </form>

@@ -9,7 +9,7 @@ const instance = axios.create({
 // Set default headers using interceptors
 instance.interceptors.request.use((config) => {
   // const authToken = localStorage.getItem("authToken");
-  const authToken = Cookies.get("authToken");
+  const authToken = Cookies.get("JWT");
   if (authToken) {
     config.headers.Authorization = `Bearer ${authToken}`;
   }

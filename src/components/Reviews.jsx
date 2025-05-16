@@ -2,7 +2,6 @@ import { format } from "date-fns";
 import RatingStars from "../utils/RatingStars";
 
 const Reviews = ({ reviews, reviewsCount, ratingsAverage }) => {
-  console.log(reviews, "reviews");
   return (
     <div>
       <div className="text-center mb-4">
