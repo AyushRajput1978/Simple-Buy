@@ -72,6 +72,11 @@ const Login = () => {
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
             </div>
+            <div>
+              <Link className="text-info" to="/forgot-password">
+                Forgot Password?
+              </Link>
+            </div>
             <div className="my-3">
               <p>
                 New Here?{" "}

@@ -1,13 +1,25 @@
-import { useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
-import defaultAvatar from "../../public/assets/default-avatar.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
+import defaultAvatar from "/assets/default-avatar.jpg";
 import { CgProfile } from "react-icons/cg";
 import { FaCartShopping } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
+import { logout } from "../redux/reducer/authSlice";
+import Cookies from "js-cookie";
 
 const Navbar = () => {
+  // Selectors
   const state = useSelector((state) => state.handleCart);
   const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Functions
+  const logoutHandler = () => {
+    dispatch(logout());
+    Cookies.remove("JWT");
+    navigate("/");
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
@@ -58,52 +70,53 @@ const Navbar = () => {
 
           {/* Move this inside navbar-collapse and use flex utilities */}
           <div className="navbar-nav d-flex align-items-center justify-content-center gap-3 mt-3 mt-lg-0">
-            {/* Cart */}
-            <NavLink to="/cart" className="nav-link position-relative">
-              <FaCartShopping className="fs-5" />
-              <span className="badge badge-dark position-absolute top-2 start-100 translate-middle">
-                {state.length}
-              </span>
-            </NavLink>
-
             {/* User Avatar */}
             {user ? (
-              <div className="dropdown text-center">
-                <img
-                  src={user.avatar || defaultAvatar}
-                  alt="User Avatar"
-                  className="rounded-circle"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    objectFit: "cover",
-                    cursor: "pointer",
-                  }}
-                  id="userMenu"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                />
-                <div className="small mt-1">{user.name || "User"}</div>
+              <>
+                {/* Cart */}
+                <NavLink to="/cart" className="nav-link position-relative">
+                  <FaCartShopping className="fs-5" />
+                  <span className="badge badge-dark position-absolute top-2 start-100 translate-middle">
+                    {state.length}
+                  </span>
+                </NavLink>
+                <div className="dropdown text-center">
+                  <img
+                    src={user.avatar || defaultAvatar}
+                    alt="User Avatar"
+                    className="rounded-circle"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      objectFit: "cover",
+                      cursor: "pointer",
+                    }}
+                    id="userMenu"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  />
+                  <div className="small mt-1">{user.name || "User"}</div>
 
-                <div
-                  className="dropdown-menu dropdown-menu-right"
-                  aria-labelledby="userMenu"
-                >
-                  <NavLink className="dropdown-item" to="/profile">
-                    <CgProfile /> Profile
-                  </NavLink>
-                  {(user.role === "admin" || user.role === "superAdmin") && (
-                    <NavLink className="dropdown-item" to="/dashboard">
-                      Dashboard
+                  <div
+                    className="dropdown-menu dropdown-menu-right"
+                    aria-labelledby="userMenu"
+                  >
+                    <NavLink className="dropdown-item" to="/profile">
+                      <CgProfile /> Profile
                     </NavLink>
-                  )}
-                  <div className="dropdown-divider"></div>
-                  <NavLink className="dropdown-item" to="/logout">
-                    <MdLogout /> Logout
-                  </NavLink>
+                    {(user.role === "admin" || user.role === "superAdmin") && (
+                      <NavLink className="dropdown-item" to="/dashboard">
+                        Dashboard
+                      </NavLink>
+                    )}
+                    <div className="dropdown-divider"></div>
+                    <button className="dropdown-item" onClick={logoutHandler}>
+                      <MdLogout /> Logout
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </>
             ) : (
               <>
                 <NavLink

@@ -22,6 +22,8 @@ import {
 import Layout from "./components/Layout";
 import ErrorBoundary from "./components/Errorboundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -41,6 +43,11 @@ root.render(
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route
+                    path="/password-reset/:token?"
+                    element={<ResetPassword />}
+                  />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/product/*" element={<PageNotFound />} />
                 </Route>
