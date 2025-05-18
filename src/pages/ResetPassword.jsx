@@ -1,7 +1,10 @@
 import { useState } from "react";
 import axios from "../axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { setAuth } from "../redux/reducer/authSlice";
 
 const ResetPassword = () => {
   const [form, setForm] = useState({
@@ -10,17 +13,20 @@ const ResetPassword = () => {
     newPasswordConfirm: "",
   });
   const { token } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const resetPasswordHandler = useMutation({
     mutationFn: async (formData) => {
       if (token)
         return axios.post(`/users/reset-password/${token}`, {
-          password: formData.newPassword,
-          passwordConfirm: formData.newPasswordConfirm,
+          newPassword: formData.newPassword,
+          newPasswordConfirm: formData.newPasswordConfirm,
         });
-      else return axios.post("/users/update-password", formData);
+      else return axios.patch("/users/update-password", formData);
     },
     onSuccess: (res) => {
+      console.log(res.data.data, "response ka dtaa");
       const { user, token } = res.data.data;
       Cookies.set("JWT", token, {
         expires: 2,
@@ -73,7 +79,7 @@ const ResetPassword = () => {
               <input
                 type="password"
                 className="form-control"
-                id="password"
+                id="new-password"
                 placeholder="New Password"
                 value={form.newPassword}
                 onChange={(e) =>
@@ -86,7 +92,7 @@ const ResetPassword = () => {
               <input
                 type="password"
                 className="form-control"
-                id="password"
+                id="confirm-new-password"
                 placeholder="New Password Confirm"
                 value={form.newPasswordConfirm}
                 onChange={(e) =>

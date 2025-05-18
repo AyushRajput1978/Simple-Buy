@@ -34,7 +34,7 @@ const Login = () => {
       }
     },
     onError: (err) => {
-      console.error("Login error", err);
+      alert(err.response.data.message);
     },
   });
 

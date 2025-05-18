@@ -24,13 +24,16 @@ instance.interceptors.response.use(
     return response;
   },
   function (error) {
+    const isLoginRequest = error?.config?.url?.includes("/login");
     if (error.response && error.response.status === 401) {
-      // localStorage.clear();
-      const allCookies = Cookies.get(); // Retrieve all cookies
-      Object.keys(allCookies).forEach((cookieName) => {
-        Cookies.remove(cookieName); // Remove each cookie
-      });
-      window.location.href = "/";
+      if (!isLoginRequest) {
+        // localStorage.clear();
+        const allCookies = Cookies.get(); // Retrieve all cookies
+        Object.keys(allCookies).forEach((cookieName) => {
+          Cookies.remove(cookieName); // Remove each cookie
+        });
+        window.location.href = "/";
+      }
     } else {
       if (instance.show_notif) {
         // showNotification({

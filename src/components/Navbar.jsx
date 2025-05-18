@@ -6,6 +6,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
 import { logout } from "../redux/reducer/authSlice";
 import Cookies from "js-cookie";
+import { MdSyncLock } from "react-icons/md";
 
 const Navbar = () => {
   // Selectors
@@ -110,6 +111,9 @@ const Navbar = () => {
                         Dashboard
                       </NavLink>
                     )}
+                    <NavLink className="dropdown-item" to="/password-reset">
+                      <MdSyncLock /> Change Password
+                    </NavLink>
                     <div className="dropdown-divider"></div>
                     <button className="dropdown-item" onClick={logoutHandler}>
                       <MdLogout /> Logout
