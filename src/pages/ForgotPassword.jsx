@@ -12,7 +12,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      const res = await axios.post("/users/forgot-password", form);
+      const res = await axios.post("/user/forgot-password", form);
       alert(res.data.message);
     } catch (err) {
       alert(err.resonse.data.message);

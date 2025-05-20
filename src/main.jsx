@@ -24,6 +24,11 @@ import ErrorBoundary from "./components/Errorboundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import DashboardHome from "./pages/Dashboard/Home";
+import ProtectedRoute from "./components/ProtectedRoutes";
+import DashboardLayout from "./components/dashboardLayout";
+import "./main.css";
+
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -51,6 +56,23 @@ root.render(
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/product/*" element={<PageNotFound />} />
                 </Route>
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute
+                      allowedRoles={["admin", "superAdmin", "user"]}
+                    >
+                      <DashboardLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<DashboardHome />} />
+                  {/* <Route path="products" element={<DashboardProducts />} /> */}
+                  {/*<Route path="categories" element={<DashboardCategories />} />
+                  <Route path="orders" element={<DashboardOrders />} />
+                  <Route path="users" element={<DashboardUsers />} /> */}
+                </Route>
+
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
             </BrowserRouter>

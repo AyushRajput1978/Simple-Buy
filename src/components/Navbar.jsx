@@ -7,6 +7,7 @@ import { MdLogout } from "react-icons/md";
 import { logout } from "../redux/reducer/authSlice";
 import Cookies from "js-cookie";
 import { MdSyncLock } from "react-icons/md";
+import { FaTachometerAlt } from "react-icons/fa";
 
 const Navbar = () => {
   // Selectors
@@ -104,19 +105,23 @@ const Navbar = () => {
                     aria-labelledby="userMenu"
                   >
                     <NavLink className="dropdown-item" to="/profile">
-                      <CgProfile /> Profile
+                      <CgProfile className="me-2" />
+                      Profile
                     </NavLink>
                     {(user.role === "admin" || user.role === "superAdmin") && (
                       <NavLink className="dropdown-item" to="/dashboard">
+                        <FaTachometerAlt className="me-2" />
                         Dashboard
                       </NavLink>
                     )}
                     <NavLink className="dropdown-item" to="/password-reset">
-                      <MdSyncLock /> Change Password
+                      <MdSyncLock className="me-2" />
+                      Change Password
                     </NavLink>
                     <div className="dropdown-divider"></div>
                     <button className="dropdown-item" onClick={logoutHandler}>
-                      <MdLogout /> Logout
+                      <MdLogout className="me-2" />
+                      Logout
                     </button>
                   </div>
                 </div>

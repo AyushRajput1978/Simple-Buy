@@ -19,11 +19,11 @@ const ResetPassword = () => {
   const resetPasswordHandler = useMutation({
     mutationFn: async (formData) => {
       if (token)
-        return axios.post(`/users/reset-password/${token}`, {
+        return axios.post(`/user/reset-password/${token}`, {
           newPassword: formData.newPassword,
           newPasswordConfirm: formData.newPasswordConfirm,
         });
-      else return axios.patch("/users/update-password", formData);
+      else return axios.patch("/user/update-password", formData);
     },
     onSuccess: (res) => {
       console.log(res.data.data, "response ka dtaa");

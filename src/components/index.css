@@ -1,7 +1,31 @@
-.card-img-top{
-    transition: transform 0.3s ease-in-out;
+.card-img-top {
+  transition: transform 0.3s ease-in-out;
 }
-.product-card:hover .card-img-top{
-   
-    transform: scale(1.1);
+.product-card:hover .card-img-top {
+  transform: scale(1.1);
+}
+.sidebar.collapsed .nav-link {
+  text-align: center;
+  padding-left: 0;
+}
+
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+}
+/* dashboard collapse toggle button */
+.toggle-btn {
+  position: absolute;
+  top: 1.25rem;
+  right: -9px;
+  padding: 0;
+  background-color: #343a40;
+  color: #fff;
+  transition: transform 0.3s ease;
+  z-index: 5;
+}
+
+.toggle-btn:hover {
+  background-color: #495057;
+  transform: scale(1.05);
 }

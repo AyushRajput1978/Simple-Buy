@@ -14,7 +14,7 @@ const Login = () => {
 
   const loginHandler = useMutation({
     mutationFn: async (formData) => {
-      return axios.post("/users/login", formData);
+      return axios.post("/user/login", formData);
     },
     onSuccess: (res) => {
       const { user, token } = res.data.data;

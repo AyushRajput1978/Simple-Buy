@@ -24,7 +24,7 @@ const Reviews = ({ reviews, reviewsCount, ratingsAverage }) => {
               <RatingStars ratings={review.rating} />
               <p className="mb-0">{format(review.createdAt, "dd MMMM yyyy")}</p>
             </div>
-            <strong>{review.user.name}</strong>
+            <strong>{review.user?.name}</strong>
             <p>{review.comment}</p>
             <hr />
           </div>

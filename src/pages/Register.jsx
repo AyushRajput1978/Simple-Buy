@@ -22,7 +22,7 @@ const Register = () => {
 
   const loginHandler = useMutation({
     mutationFn: async (formData) => {
-      return axios.post("/users/signup", formData);
+      return axios.post("/user/signup", formData);
     },
     onSuccess: (res) => {
       const { user, token } = res.data.data;

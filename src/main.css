@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter&family=Montserrat&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #f8f9fa; /* Optional Bootstrap-friendly bg */
+  color: #212529;
+  margin: 0;
+  padding: 0;
+}
+
+/* Optional overrides */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Montserrat", sans-serif;
+}
+
+button,
+.btn,
+.product-title {
+  font-family: "Poppins", sans-serif;
+}
