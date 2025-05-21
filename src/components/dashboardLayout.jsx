@@ -66,19 +66,20 @@ const DashboardLayout = () => {
             {!collapsed && "Dashboard"}
           </NavLink>
           <NavLink
+            to="/dashboard/product-categories"
+            className="nav-link text-white my-1"
+          >
+            <FaTags className="me-2" />
+            {!collapsed && "Product Categories"}
+          </NavLink>
+          <NavLink
             to="/dashboard/products"
             className="nav-link text-white my-1"
           >
             <FaBoxOpen className="me-2" />
             {!collapsed && "Products"}
           </NavLink>
-          <NavLink
-            to="/dashboard/categories"
-            className="nav-link text-white my-1"
-          >
-            <FaTags className="me-2" />
-            {!collapsed && "Categories"}
-          </NavLink>
+
           <NavLink to="/dashboard/orders" className="nav-link text-white my-1">
             <FaClipboardList className="me-2" />
             {!collapsed && "Orders"}

@@ -9,13 +9,13 @@ import { useQuery } from "@tanstack/react-query";
 import Skeleton from "react-loading-skeleton";
 
 const DashboardHome = () => {
-  const getAllStats = async () => {
+  const fetchAllStats = async () => {
     const res = await axios.get("/dashboard/stats");
     return res.data.data;
   };
   const { data: stats, isLoading } = useQuery({
     queryKey: ["dashboard-stats"],
-    queryFn: getAllStats,
+    queryFn: fetchAllStats,
   });
 
   const StatCard = ({ title, icon, iconColor, bgColor, value }) => (
