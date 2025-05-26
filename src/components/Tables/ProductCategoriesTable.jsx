@@ -47,7 +47,7 @@ const ProductCategoriesTable = () => {
             </thead>
             <tbody>
               {data.map((cat, index) => (
-                <tr key={cat.id}>
+                <tr key={cat._id}>
                   <td text-label="SNo.">
                     <span className="fw-normal">{index + 1}</span>
                   </td>

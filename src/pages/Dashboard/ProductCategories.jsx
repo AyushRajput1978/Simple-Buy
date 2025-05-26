@@ -5,7 +5,7 @@ import AddEditProductCategoriesModal from "../../components/AddEditModals/AddEdi
 
 const ProductCategories = () => {
   const [openModal, setOpenModal] = useState(false);
-  const handleAddProduct = () => {
+  const handleAddProductCategory = () => {
     setOpenModal(true);
   };
   return (
@@ -15,7 +15,7 @@ const ProductCategories = () => {
         <AddButton
           label="Add Product Category"
           icon="fa fa-box"
-          onClick={handleAddProduct}
+          onClick={handleAddProductCategory}
           className="px-3"
         />
       </div>

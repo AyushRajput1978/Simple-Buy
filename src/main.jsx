@@ -29,6 +29,7 @@ import ProtectedRoute from "./components/ProtectedRoutes";
 import DashboardLayout from "./components/dashboardLayout";
 import "./main.css";
 import ProductCategories from "./pages/Dashboard/ProductCategories";
+import DashboardProducts from "./pages/Dashboard/Products";
 
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -46,7 +47,10 @@ root.render(
                   <Route path="/product/:id" element={<Product />} />
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/contact" element={<ContactPage />} />
+                  {/* Order related routes */}
+                  <Route path="/checkout" element={<Checkout />} />
                   <Route path="/cart" element={<Cart />} />
+                  {/* Authentication related routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -54,9 +58,9 @@ root.render(
                     path="/password-reset/:token?"
                     element={<ResetPassword />}
                   />
-                  <Route path="/checkout" element={<Checkout />} />
                   <Route path="/product/*" element={<PageNotFound />} />
                 </Route>
+                {/* dashboard Routes */}
                 <Route
                   path="/dashboard"
                   element={
@@ -72,7 +76,7 @@ root.render(
                     path="product-categories"
                     element={<ProductCategories />}
                   />
-                  {/* <Route path="products" element={<DashboardProducts />} /> */}
+                  <Route path="products" element={<DashboardProducts />} />
                   {/*<Route path="orders" element={<DashboardOrders />} />
                   <Route path="users" element={<DashboardUsers />} /> */}
                 </Route>

@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Button } from "react-bootstrap";
 
 /**
  * Reusable Add Button Component
@@ -17,15 +18,15 @@ const AddButton = ({
   disabled = false,
 }) => {
   return (
-    <button
+    <Button
       type="button"
-      className={`btn btn-dark d-flex align-items-center gap-2 ${className}`}
+      className={`btn-dark d-flex align-items-center gap-2 ${className}`}
       onClick={onClick}
       disabled={disabled}
     >
       <i className={icon}></i>
       <span>{label}</span>
-    </button>
+    </Button>
   );
 };
 

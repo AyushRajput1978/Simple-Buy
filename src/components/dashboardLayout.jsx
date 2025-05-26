@@ -23,7 +23,7 @@ const DashboardLayout = () => {
     }
   }, []);
   return (
-    <aside className="d-flex">
+    <aside className="d-flex overflow-hidden">
       {/* Sidebar */}
       <div
         className={`bg-dark text-white p-3 sidebar position-relative ${
