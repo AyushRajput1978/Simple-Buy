@@ -9,7 +9,7 @@ const DashboardProducts = () => {
     setShowModal(true);
   };
   return (
-    <div className="container">
+    <div className="container overflow-hidden p-0">
       <h1>PRODUCTS</h1>
       <div className="d-flex justify-content-end mb-4">
         <AddButton

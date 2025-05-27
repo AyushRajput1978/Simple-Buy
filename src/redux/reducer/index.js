@@ -1,5 +1,4 @@
 // redux/reducer/index.js
-// reducer/index.js
 import { combineReducers } from "redux";
 import handleCartReducer from "./handleCart";
 import authReducer from "./authSlice";

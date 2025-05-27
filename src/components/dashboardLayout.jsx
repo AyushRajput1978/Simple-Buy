@@ -92,7 +92,10 @@ const DashboardLayout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow-1 p-4" style={{ minHeight: "100vh" }}>
+      <div
+        className="flex-grow-1 p-3 overflow-hidden"
+        style={{ minHeight: "100vh" }}
+      >
         <Outlet />
       </div>
     </aside>

@@ -1,24 +1,32 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "../../axios"; // your axios instance
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import ImageUploader from "../layout/ImageUploader";
 
 const AddEditProductModal = ({ show, onClose, initialData = null }) => {
   const queryClient = useQueryClient();
+  const [image, setImage] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
+    price: "",
+    priceDiscount: "",
+    description: "",
+    brand: "",
+    countInStock: "",
+    category: { id: null, name: "" },
+    image: "",
   });
 
   // Pre-fill form when editing
   useEffect(() => {
     if (initialData) {
       setFormData({
-        name: initialData.name || "",
+        ...initialData,
       });
-    } else {
-      setFormData({ name: "" });
+      setImage(initialData.image);
     }
   }, [initialData, show]);
 
@@ -47,7 +55,6 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-      //   [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -64,28 +71,27 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
         </Modal.Header>
 
         <Modal.Body>
-          <Form.Group className="mb-3">
-            <Form.Label>Product Name</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              placeholder="Enter Product name"
-              autoFocus
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-          {/* <Form.Group className="mb-3">
-            <Form.Check
-              type="checkbox"
-              name="status"
-              label="Active"
-              checked={formData.status}
-              onChange={handleChange}
-            />
-          </Form.Group> */}
+          <Row>
+            <Col className="mb-6 d-flex justify-content-center">
+              <ImageUploader img={image} setImg={setImage} size="1920 X 400" />
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={3} md={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Product Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  placeholder="Enter Product name"
+                  autoFocus
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </Form.Group>
+            </Col>
+          </Row>
         </Modal.Body>
 
         <Modal.Footer>

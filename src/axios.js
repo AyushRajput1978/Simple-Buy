@@ -1,5 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { store } from "./redux/store";
+import { logout } from "./redux/reducer/authSlice";
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,
@@ -32,7 +34,8 @@ instance.interceptors.response.use(
         Object.keys(allCookies).forEach((cookieName) => {
           Cookies.remove(cookieName); // Remove each cookie
         });
-        window.location.href = "/";
+        store.dispatch(logout());
+        window.location.href = "/login";
       }
     } else {
       if (instance.show_notif) {
