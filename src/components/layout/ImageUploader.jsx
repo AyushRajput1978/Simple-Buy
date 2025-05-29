@@ -43,7 +43,7 @@ const ImageUploader = ({ img, setImg, size }) => {
   });
   return (
     <div
-      className="border border-success "
+      className="border border-success"
       {...getRootProps()}
       style={{
         marginBottom: "16px",
@@ -64,9 +64,7 @@ const ImageUploader = ({ img, setImg, size }) => {
       ) : (
         <p>Drag & drop an image here, or click to select one {size}</p>
       )}
-      {image && (
-        <Button className="mt-4 green-btn fontweigh-500">Change</Button>
-      )}
+      {image && <Button className="mt-4 btn-dark fontweigh-500">Change</Button>}
     </div>
   );
 };

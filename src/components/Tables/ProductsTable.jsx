@@ -16,7 +16,7 @@ import AddEditProductModal from "../AddEditModals/AddEditProductModal";
 
 const ProductsTable = () => {
   const [showModal, setShowModal] = useState(false);
-  const [initialData, setInitialData] = useState([]);
+  const [initialData, setInitialData] = useState(null);
   const fetchProducts = async () => {
     const res = await axios.get("/dashboard/products");
     return res.data.data;
@@ -39,6 +39,7 @@ const ProductsTable = () => {
     setInitialData(res.data.data);
     setShowModal(true);
   };
+  console.log(data, "data hia prod");
   return (
     <Card border="light" className="shadow-sm">
       <Card.Body className="p-0 pb-4 justify-content-center">
@@ -61,7 +62,7 @@ const ProductsTable = () => {
               </thead>
               <tbody>
                 {data.map((prod, index) => (
-                  <tr key={prod._id}>
+                  <tr key={prod.id}>
                     <td text-label="SNo.">
                       <span className="fw-normal">{index + 1}</span>
                     </td>
@@ -76,9 +77,9 @@ const ProductsTable = () => {
                     <td text-label="Name">
                       <span className="fw-normal">{prod.name}</span>
                     </td>
-                    <td text-label="category">
+                    {/* <td text-label="category">
                       <span className="fw-normal">{prod.category}</span>
-                    </td>
+                    </td> */}
                     <td text-label="Price">
                       <span className="fw-normal">{prod.price}</span>
                     </td>
@@ -87,15 +88,16 @@ const ProductsTable = () => {
                         <Dropdown.Toggle
                           as="button"
                           className="btn btn-link text-dark m-0 p-0 border-0 shadow-none"
-                          id={`dropdown-button-${prod._id}`}
+                          id={`dropdown-button-${prod.id}`}
                         >
                           <BsThreeDots size={18} />
                         </Dropdown.Toggle>
+                        {console.log(prod, "prdohaiaahia")}
 
                         <Dropdown.Menu>
                           <Dropdown.Item
                             onClick={() => {
-                              handleEdit(prod._id);
+                              handleEdit(prod.id);
                             }}
                             className="d-flex align-items-center gap-1"
                           >
