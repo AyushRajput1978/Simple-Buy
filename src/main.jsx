@@ -30,6 +30,7 @@ import DashboardLayout from "./components/dashboardLayout";
 import "./main.css";
 import ProductCategories from "./pages/Dashboard/ProductCategories";
 import DashboardProducts from "./pages/Dashboard/Products";
+import DashboardUsers from "./pages/Dashboard/Users";
 
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -77,8 +78,8 @@ root.render(
                     element={<ProductCategories />}
                   />
                   <Route path="products" element={<DashboardProducts />} />
-                  {/*<Route path="orders" element={<DashboardOrders />} />
-                  <Route path="users" element={<DashboardUsers />} /> */}
+                  {/*<Route path="orders" element={<DashboardOrders />} />*/}
+                  <Route path="users" element={<DashboardUsers />} />
                 </Route>
 
                 <Route path="*" element={<PageNotFound />} />

@@ -3,8 +3,13 @@ import Cookies from "js-cookie";
 import { store } from "./redux/store";
 import { logout } from "./redux/reducer/authSlice";
 
+const sessionId = localStorage.getItem("sessionId");
+console.log(sessionId, "session ki id");
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,
+  headers: {
+    "x-session-id": sessionId,
+  },
   params: {},
 });
 

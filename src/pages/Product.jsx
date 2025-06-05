@@ -3,8 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import { useDispatch } from "react-redux";
 import axios from "../axios";
-
-import { addItem } from "../redux/reducer/handleCart";
 import { useQuery } from "@tanstack/react-query";
 import Reviews from "../components/Reviews";
 import RatingStars from "../utils/RatingStars";

@@ -5,18 +5,18 @@ import axios from "../../axios"; // your axios instance
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ImageUploader from "../layout/ImageUploader";
 import Select from "react-select";
-import { valuehandler } from "../../utils/helper";
 
 const AddEditProductModal = ({ show, onClose, initialData = null }) => {
+  // hooks (states)
   const queryClient = useQueryClient();
   const [image, setImage] = useState("");
   const initialFormState = {
     // image: "",
     name: "",
-    price: "",
-    priceDiscount: "",
+    price: null,
+    priceDiscount: null,
     brand: "",
-    countInStock: "",
+    countInStock: null,
     category: "",
     description: "",
   };
@@ -28,17 +28,31 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
     if (initialData) {
       setFormData({
         ...initialData,
+        category: {
+          label: initialData.category.name,
+          value: initialData.category._id,
+        },
       });
       setImage(initialData.image);
     }
   }, [initialData, show]);
-  const mutation = useMutation({
+
+  useEffect(() => {
+    setFormData({ ...formData, image });
+  }, [image]);
+
+  // Functions
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data) => {
       if (initialData) {
-        return await axios.patch(
-          `/dashboard/products/${initialData._id}`,
-          data
-        );
+        return await axios({
+          method: "PATCH",
+          url: `/dashboard/products/${initialData._id}`,
+          data,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
       } else {
         return await axios({
           method: "POST",
@@ -52,7 +66,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["add-edit-products"]);
-      onClose();
+      handleCloseAndClearState();
     },
     onError: (error) => {
       console.error("Failed to submit:", error);
@@ -70,7 +84,6 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = new FormData();
-    form.set("image", image);
     for (const key in formData) {
       if (key === "category") {
         form.append("productCategoryId", formData[key].value);
@@ -79,8 +92,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
         form.append(key, formData[key]);
       }
     }
-    console.log(form, "form hia na");
-    mutation.mutate(form);
+    mutate(form);
   };
   const fetchProductCategories = async () => {
     const res = await axios.get("/dashboard/product-categories");
@@ -101,7 +113,6 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
     setFormData(initialFormState);
     setImage("");
   };
-  console.log(formData, "form hai na");
   return (
     <Modal show={show} onHide={handleCloseAndClearState} centered size="xl">
       <Form onSubmit={handleSubmit}>
@@ -112,7 +123,12 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
         <Modal.Body>
           <Row className="mb-5">
             <Col className=" d-flex justify-content-center">
-              <ImageUploader img={image} setImg={setImage} size="1920 X 400" />
+              <ImageUploader
+                img={image}
+                setImg={setImage}
+                size="1920 X 400"
+                isLoading={isPending}
+              />
             </Col>
           </Row>
           <Row>
@@ -126,6 +142,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                   autoFocus
                   value={formData.name}
                   onChange={handleChange}
+                  disabled={isPending}
                   required
                 />
               </Form.Group>
@@ -134,11 +151,12 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
               <Form.Group className="mb-3">
                 <Form.Label>Price</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="number"
                   name="price"
                   placeholder="Enter Product's Price"
                   value={formData.price}
                   onChange={handleChange}
+                  disabled={isPending}
                   required
                 />
               </Form.Group>
@@ -147,11 +165,12 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
               <Form.Group className="mb-3">
                 <Form.Label>Price Discount</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="number"
                   name="priceDiscount"
                   placeholder="Enter Price Dicount"
                   value={formData.priceDiscount}
                   onChange={handleChange}
+                  disabled={isPending}
                 />
               </Form.Group>
             </Col>
@@ -164,6 +183,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                   placeholder="Enter Brand Name"
                   value={formData.brand}
                   onChange={handleChange}
+                  disabled={isPending}
                 />
               </Form.Group>
             </Col>
@@ -173,14 +193,12 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                 <Select
                   name="category"
                   placeholder="Please select the category"
-                  value={valuehandler(
-                    productCategoriesOptions,
-                    formData.category
-                  )}
+                  value={formData.category}
                   options={productCategoriesOptions}
                   onChange={(data) =>
                     setFormData({ ...formData, category: data })
                   }
+                  isDisabled={isPending}
                 />
               </Form.Group>
             </Col>
@@ -193,6 +211,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                   placeholder="Enter count in Stock "
                   value={formData.countInStock}
                   onChange={handleChange}
+                  disabled={isPending}
                 />
               </Form.Group>
             </Col>
@@ -206,6 +225,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                   placeholder="Enter Description"
                   value={formData.description}
                   onChange={handleChange}
+                  disabled={isPending}
                 />
               </Form.Group>
             </Col>
@@ -213,11 +233,15 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="light" onClick={handleCloseAndClearState}>
+          <Button
+            variant="light"
+            disabled={isPending}
+            onClick={handleCloseAndClearState}
+          >
             Cancel
           </Button>
-          <Button variant="dark" type="submit" disabled={mutation.isLoading}>
-            {mutation.isLoading ? "Saving..." : initialData ? "Update" : "Add"}
+          <Button variant="dark" type="submit" disabled={isPending}>
+            {isPending ? "Saving..." : initialData ? "Update" : "Add"}
           </Button>
         </Modal.Footer>
       </Form>

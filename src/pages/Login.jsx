@@ -23,6 +23,7 @@ const Login = () => {
         secure: true,
         sameSite: "Strict",
       });
+      console.log(user, "user hia na");
       // Store in Redux
       dispatch(setAuth({ user }));
 

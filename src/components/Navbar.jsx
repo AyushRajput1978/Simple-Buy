@@ -8,13 +8,14 @@ import { logout } from "../redux/reducer/authSlice";
 import Cookies from "js-cookie";
 import { MdSyncLock } from "react-icons/md";
 import { FaTachometerAlt } from "react-icons/fa";
+import useCart from "../hooks/useCart";
 
 const Navbar = () => {
   // Selectors
-  const state = useSelector((state) => state.handleCart);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { cart } = useCart();
 
   // Functions
   const logoutHandler = () => {
@@ -73,15 +74,16 @@ const Navbar = () => {
           {/* Move this inside navbar-collapse and use flex utilities */}
           <div className="navbar-nav d-flex align-items-center justify-content-center gap-3 mt-3 mt-lg-0">
             {/* User Avatar */}
+            <NavLink to="/cart" className="nav-link position-relative">
+              <FaCartShopping className="fs-5" />
+              <span className="badge badge-dark position-absolute top-2 start-100 translate-middle">
+                {cart.length}
+              </span>
+            </NavLink>
             {user ? (
               <>
                 {/* Cart */}
-                <NavLink to="/cart" className="nav-link position-relative">
-                  <FaCartShopping className="fs-5" />
-                  <span className="badge badge-dark position-absolute top-2 start-100 translate-middle">
-                    {state.length}
-                  </span>
-                </NavLink>
+
                 <div className="dropdown text-center">
                   <img
                     src={user.avatar || defaultAvatar}

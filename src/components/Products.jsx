@@ -5,19 +5,22 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import { Link } from "react-router-dom";
-import { addItem } from "../redux/reducer/handleCart";
 
 import "./index.css";
 import axios from "../axios";
 import { useQuery } from "@tanstack/react-query";
+import useCart from "../hooks/useCart";
+import CustomToast from "./layout/CustomToast";
 
 const Products = () => {
   const [filter, setFilter] = useState([]);
-
-  const dispatch = useDispatch();
+  const [showToast, setShowToast] = useState(false);
+  const [toastBody, setToastBody] = useState("");
+  const [success, setSuccess] = useState(true);
+  const { addToCart } = useCart();
 
   const addProduct = (product) => {
-    dispatch(addItem(product));
+    addToCart(product.id, 1, setShowToast, setToastBody, setSuccess);
   };
 
   const getProducts = async () => {
@@ -36,7 +39,7 @@ const Products = () => {
   useEffect(() => {
     setFilter(data);
   }, [data]);
-  
+
   const Loading = () => {
     return (
       <>
@@ -65,7 +68,7 @@ const Products = () => {
     );
   };
   const filterProduct = (cat) => {
-    const updatedList = data.filter((item) => item.category === cat);
+    const updatedList = data.filter((item) => item.category.name === cat);
     setFilter(updatedList);
   };
   const ShowProducts = () => {
@@ -80,25 +83,25 @@ const Products = () => {
           </button>
           <button
             className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => filterProduct("men's clothing")}
+            onClick={() => filterProduct("Men's clothing")}
           >
             Men's Clothing
           </button>
           <button
             className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => filterProduct("women's clothing")}
+            onClick={() => filterProduct("Women's clothing")}
           >
             Women's Clothing
           </button>
           <button
             className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => filterProduct("jewelery")}
+            onClick={() => filterProduct("Jewelery")}
           >
             Jewelery
           </button>
           <button
             className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => filterProduct("electronics")}
+            onClick={() => filterProduct("Electronics")}
           >
             Electronics
           </button>
@@ -168,6 +171,12 @@ const Products = () => {
           {productsLoading ? <Loading /> : <ShowProducts />}
         </div>
       </div>
+      <CustomToast
+        show={showToast}
+        toastBody={toastBody}
+        setShow={setShowToast}
+        success={success}
+      />
     </>
   );
 };

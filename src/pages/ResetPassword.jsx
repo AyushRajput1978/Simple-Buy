@@ -26,7 +26,6 @@ const ResetPassword = () => {
       else return axios.patch("/user/update-password", formData);
     },
     onSuccess: (res) => {
-      console.log(res.data.data, "response ka dtaa");
       const { user, token } = res.data.data;
       Cookies.set("JWT", token, {
         expires: 2,

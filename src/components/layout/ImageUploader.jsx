@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button, Image } from "react-bootstrap";
 
-const ImageUploader = ({ img, setImg, size }) => {
+const ImageUploader = ({ img, setImg, size, isLoading }) => {
   const [image, setImage] = useState(null);
   useEffect(() => {
     // Check if img is a File (binary)
@@ -64,7 +64,11 @@ const ImageUploader = ({ img, setImg, size }) => {
       ) : (
         <p>Drag & drop an image here, or click to select one {size}</p>
       )}
-      {image && <Button className="mt-4 btn-dark fontweigh-500">Change</Button>}
+      {image && (
+        <Button className="mt-4 btn-dark fontweigh-500" disabled={isLoading}>
+          Change
+        </Button>
+      )}
     </div>
   );
 };
