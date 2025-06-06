@@ -165,7 +165,7 @@ const Cart = () => {
                     </ul>
 
                     <Link
-                      to="/checkout"
+                      to="/payment"
                       className="btn btn-dark btn-lg btn-block"
                     >
                       Go to checkout

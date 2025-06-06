@@ -1,8 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import useCart from "../hooks/useCart";
 const Checkout = () => {
-  const state = useSelector((state) => state.handleCart);
+  const { cart } = useCart();
 
   const EmptyCart = () => {
     return (
@@ -23,11 +24,11 @@ const Checkout = () => {
     let subtotal = 0;
     let shipping = 30.0;
     let totalItems = 0;
-    state.map((item) => {
+    cart.map((item) => {
       return (subtotal += item.price * item.qty);
     });
 
-    state.map((item) => {
+    cart.map((item) => {
       return (totalItems += item.qty);
     });
     return (
@@ -287,7 +288,7 @@ const Checkout = () => {
     <div className="container my-3 py-3">
       <h1 className="text-center">Checkout</h1>
       <hr />
-      {state.length ? <ShowCheckout /> : <EmptyCart />}
+      {cart.length ? <ShowCheckout /> : <EmptyCart />}
     </div>
   );
 };

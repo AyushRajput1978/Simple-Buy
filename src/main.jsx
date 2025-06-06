@@ -31,9 +31,14 @@ import "./main.css";
 import ProductCategories from "./pages/Dashboard/ProductCategories";
 import DashboardProducts from "./pages/Dashboard/Products";
 import DashboardUsers from "./pages/Dashboard/Users";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import Payment from "./pages/Payment";
 
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
+console.log(import.meta.env, "env ki values");
 root.render(
   <React.StrictMode>
     <Provider store={store}>
@@ -41,49 +46,55 @@ root.render(
         <QueryClientProvider client={queryClient}>
           <ErrorBoundary>
             <BrowserRouter>
-              <Routes>
-                <Route element={<Layout />}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/product" element={<Products />} />
-                  <Route path="/product/:id" element={<Product />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  {/* Order related routes */}
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/cart" element={<Cart />} />
-                  {/* Authentication related routes */}
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Elements stripe={stripePromise}>
+                <Routes>
+                  <Route element={<Layout />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/product" element={<Products />} />
+                    <Route path="/product/:id" element={<Product />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    {/* Order related routes */}
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/payment" element={<Payment />} />
+                    {/* Authentication related routes */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route
+                      path="/forgot-password"
+                      element={<ForgotPassword />}
+                    />
+                    <Route
+                      path="/password-reset/:token?"
+                      element={<ResetPassword />}
+                    />
+                    <Route path="/product/*" element={<PageNotFound />} />
+                  </Route>
+                  {/* dashboard Routes */}
                   <Route
-                    path="/password-reset/:token?"
-                    element={<ResetPassword />}
-                  />
-                  <Route path="/product/*" element={<PageNotFound />} />
-                </Route>
-                {/* dashboard Routes */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute
-                      allowedRoles={["admin", "superAdmin", "user"]}
-                    >
-                      <DashboardLayout />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<DashboardHome />} />
-                  <Route
-                    path="product-categories"
-                    element={<ProductCategories />}
-                  />
-                  <Route path="products" element={<DashboardProducts />} />
-                  {/*<Route path="orders" element={<DashboardOrders />} />*/}
-                  <Route path="users" element={<DashboardUsers />} />
-                </Route>
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute
+                        allowedRoles={["admin", "superAdmin", "user"]}
+                      >
+                        <DashboardLayout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route index element={<DashboardHome />} />
+                    <Route
+                      path="product-categories"
+                      element={<ProductCategories />}
+                    />
+                    <Route path="products" element={<DashboardProducts />} />
+                    {/*<Route path="orders" element={<DashboardOrders />} />*/}
+                    <Route path="users" element={<DashboardUsers />} />
+                  </Route>
 
-                <Route path="*" element={<PageNotFound />} />
-              </Routes>
+                  <Route path="*" element={<PageNotFound />} />
+                </Routes>
+              </Elements>
             </BrowserRouter>
           </ErrorBoundary>
         </QueryClientProvider>
