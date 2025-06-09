@@ -1,5 +1,3 @@
-import { useState } from "react";
-import AddButton from "../../components/layout/AddButton";
 import UsersTable from "../../components/Tables/UsersTable";
 
 const DashboardUsers = () => {

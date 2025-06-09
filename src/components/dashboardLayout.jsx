@@ -70,7 +70,7 @@ const DashboardLayout = () => {
             className="nav-link text-white my-1"
           >
             <FaTags className="me-2" />
-            {!collapsed && "Product Categories"}
+            {!collapsed && "Categories"}
           </NavLink>
           <NavLink
             to="/dashboard/products"

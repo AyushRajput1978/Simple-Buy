@@ -27,7 +27,7 @@ const Payment = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastBody, setToastBody] = useState("");
   const [success, setSuccess] = useState(true);
-  const { cart } = useCart();
+  const { cart, fetchCart } = useCart();
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ const Payment = () => {
         setShowToast(true);
         setToastBody("Payment Successful");
         setSuccess(true);
-        cart();
+        fetchCart();
         setTimeout(() => navigate("/"), 3000);
       }
     } catch (err) {

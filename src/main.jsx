@@ -34,11 +34,11 @@ import DashboardUsers from "./pages/Dashboard/Users";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import Payment from "./pages/Payment";
+import DashboardOrders from "./pages/Dashboard/Orders";
 
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
-console.log(import.meta.env, "env ki values");
 root.render(
   <React.StrictMode>
     <Provider store={store}>
@@ -88,7 +88,7 @@ root.render(
                       element={<ProductCategories />}
                     />
                     <Route path="products" element={<DashboardProducts />} />
-                    {/*<Route path="orders" element={<DashboardOrders />} />*/}
+                    <Route path="orders" element={<DashboardOrders />} />
                     <Route path="users" element={<DashboardUsers />} />
                   </Route>
 
