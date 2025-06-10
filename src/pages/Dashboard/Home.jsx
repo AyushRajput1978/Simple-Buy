@@ -63,8 +63,8 @@ const DashboardHome = () => {
       prefix: "₹ ",
     },
     {
-      title: "Total Categories",
-      key: "totalCategories",
+      title: "Total Product Categories",
+      key: "totalProductCategories",
       icon: <BiSolidCategoryAlt size={18} color="#003049" />,
       bgColor: "rgb(0 48 73 / 20%)",
     },

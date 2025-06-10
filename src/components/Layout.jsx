@@ -10,7 +10,7 @@ import { setAuth } from "../redux/reducer/authSlice";
 
 const Layout = () => {
   const { fetchCart } = useCart();
-  const user = useSelector((state) => state.auth.user);
+
   const dispatch = useDispatch();
   function getSessionId() {
     let sessionId = localStorage.getItem("sessionId");

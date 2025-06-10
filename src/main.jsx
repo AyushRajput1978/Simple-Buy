@@ -35,6 +35,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import Payment from "./pages/Payment";
 import DashboardOrders from "./pages/Dashboard/Orders";
+import MyProfile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -54,6 +55,7 @@ root.render(
                     <Route path="/product/:id" element={<Product />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/profile" element={<MyProfile />} />
                     {/* Order related routes */}
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/cart" element={<Cart />} />
