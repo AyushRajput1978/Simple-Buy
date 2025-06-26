@@ -15,10 +15,10 @@ const Reviews = ({ reviews, reviewsCount, ratingsAverage }) => {
         </div>
         <p className="">Based on {reviewsCount} customers reviews</p>
       </div>
-      {reviews.length === 0 ? (
+      {reviews?.length === 0 ? (
         <p>No reviews yet.</p>
       ) : (
-        reviews.map((review) => (
+        reviews?.map((review) => (
           <div key={review.id}>
             <div className="d-flex gap-2 mb-2">
               <RatingStars ratings={review.rating} />

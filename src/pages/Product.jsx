@@ -20,12 +20,13 @@ const Product = () => {
   const getProduct = async ({ queryKey }) => {
     const [_, id] = queryKey;
     const res = await axios(`/products/${id}`);
-    return res.data.data.data;
+    return res.data.data;
   };
   const getSimilarProducts = async ({ queryKey }) => {
     const [_, id] = queryKey;
     const res = await axios(`/products/${id}/similar`);
-    return res.data.data.similarProducts;
+
+    return res?.data?.data?.similarProducts;
   };
 
   // useQuery to get the products and cached the result
@@ -37,7 +38,6 @@ const Product = () => {
     queryKey: ["similar-product", id],
     queryFn: getSimilarProducts,
   });
-
   const ProductLoading = () => {
     return (
       <>
@@ -68,18 +68,20 @@ const Product = () => {
             <div className="col-md-6 col-sm-12 py-3">
               <img
                 className="img-fluid"
-                src={product.image}
-                alt={product.name}
+                src={product?.image}
+                alt={product?.name}
                 width="400px"
                 height="400px"
               />
             </div>
             <div className="col-md-6 col-md-6 py-5">
-              <h4 className="text-uppercase text-muted">{product.category}</h4>
-              <h1 className="display-5">{product.name}</h1>
+              <h4 className="text-uppercase text-muted">
+                {product?.category.name}
+              </h4>
+              <h1 className="display-5">{product?.name}</h1>
               <RatingStars ratings={product?.ratingsAverage} />
-              <h3 className="display-6  my-4">${product.price}</h3>
-              <p className="lead">{product.description}</p>
+              <h3 className="display-6  my-4">${product?.price}</h3>
+              <p className="lead">{product?.description}</p>
               <button
                 className="btn btn-outline-dark"
                 onClick={() => addProduct(product)}

@@ -156,7 +156,7 @@ const Payment = () => {
                   className="w-100"
                   variant="primary"
                 >
-                  {processing ? "Processing..." : `Pay $${total}`}
+                  {processing ? "Processing..." : `Pay $${total.toFixed(2)}`}
                 </Button>
               </Form>
               {error && <div className="text-danger mt-3">{error}</div>}

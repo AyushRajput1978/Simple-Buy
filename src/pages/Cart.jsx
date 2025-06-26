@@ -4,6 +4,7 @@ import { useState } from "react";
 import CustomToast from "../components/layout/CustomToast";
 import { Button } from "react-bootstrap";
 import ConfirmModal from "../components/layout/AlertModal";
+import { useSelector } from "react-redux";
 
 const Cart = () => {
   const { cart, deleteCart, updateCart } = useCart();
@@ -12,6 +13,7 @@ const Cart = () => {
   const [toastBody, setToastBody] = useState("");
   const [success, setSuccess] = useState(true);
 
+  const userData = useSelector((state) => state.auth.user);
   const EmptyCart = () => {
     return (
       <div className="container">
@@ -165,7 +167,7 @@ const Cart = () => {
                     </ul>
 
                     <Link
-                      to="/payment"
+                      to={userData ? "/payment" : "/register"}
                       className="btn btn-dark btn-lg btn-block"
                     >
                       Go to checkout

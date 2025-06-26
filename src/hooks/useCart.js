@@ -17,12 +17,10 @@ const useCart = () => {
 
   const addToCart = async (
     productId,
-    // dis_id,
     quantity,
     setShowToast,
     setToastBody,
     setSuccess
-    // variantId
   ) => {
     try {
       const res = await axios({
