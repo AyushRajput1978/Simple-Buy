@@ -16,7 +16,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cart } = useCart();
-
+  console.log(user, "user hai na");
   // Functions
   const logoutHandler = () => {
     dispatch(logout());
@@ -86,8 +86,8 @@ const Navbar = () => {
 
                 <div className="dropdown text-center">
                   <img
-                    src={user.avatar || defaultAvatar}
-                    alt="User Avatar"
+                    src={user.photo || defaultAvatar}
+                    alt="User profile pic"
                     className="rounded-circle"
                     style={{
                       width: "40px",

@@ -186,6 +186,7 @@ const Product = () => {
       </div>
       {!productLoading && (
         <Reviews
+          productId={product?.id}
           reviews={product?.reviews}
           reviewsCount={product?.ratingsQuantity}
           ratingsAverage={product?.ratingsAverage}
