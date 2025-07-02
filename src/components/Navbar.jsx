@@ -16,7 +16,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cart } = useCart();
-  console.log(user, "user hai na");
+
   // Functions
   const logoutHandler = () => {
     dispatch(logout());

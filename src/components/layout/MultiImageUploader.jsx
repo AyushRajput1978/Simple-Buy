@@ -19,9 +19,13 @@ const MultImageUploader = ({ images, setImages }) => {
     onDrop,
   });
 
+  const getImagePreview = (image) => {
+    return typeof image === "string" ? image : URL.createObjectURL(image);
+  };
+
   return (
     <Row className="justify-content-center g-3">
-      {images?.map((file, index) => (
+      {images?.map((image, index) => (
         <Col
           lg={2}
           md={3}
@@ -38,7 +42,7 @@ const MultImageUploader = ({ images, setImages }) => {
             }}
           >
             <Image
-              src={URL.createObjectURL(file)} // ✅ Directly from File
+              src={getImagePreview(image)}
               alt={`Preview ${index + 1}`}
               fluid
               style={{ height: "11em", width: "100%", objectFit: "cover" }}

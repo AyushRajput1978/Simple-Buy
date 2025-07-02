@@ -30,7 +30,11 @@ const Product = () => {
   };
 
   // useQuery to get the products and cached the result
-  const { data: product, isLoading: productLoading } = useQuery({
+  const {
+    data: product,
+    isLoading: productLoading,
+    refetch: refetchProductDetail,
+  } = useQuery({
     queryKey: ["detailed-product", id],
     queryFn: getProduct,
   });
@@ -190,6 +194,7 @@ const Product = () => {
           reviews={product?.reviews}
           reviewsCount={product?.ratingsQuantity}
           ratingsAverage={product?.ratingsAverage}
+          refetchProductDetail={refetchProductDetail}
         />
       )}
     </div>

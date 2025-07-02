@@ -8,7 +8,13 @@ import { FaImages } from "react-icons/fa";
 import { BsChatQuote } from "react-icons/bs";
 import StarRatingInput from "../layout/StarRatingsInput";
 
-const AddEditReview = ({ productId, show, onClose, initialData = null }) => {
+const AddEditReview = ({
+  productId,
+  show,
+  onClose,
+  initialData = null,
+  onUpdated,
+}) => {
   const queryClient = useQueryClient();
   const [galleryImages, setGalleryImages] = useState([]);
 
@@ -18,12 +24,11 @@ const AddEditReview = ({ productId, show, onClose, initialData = null }) => {
     comment: "",
   };
   const [formData, setFormData] = useState(initialFormState);
-
   // Pre-fill form on edit
   useEffect(() => {
     if (initialData) {
       setFormData({ ...initialData });
-      setGalleryImages(initialData.images);
+      setGalleryImages([...initialData.images]);
     }
   }, [initialData, show]);
 
@@ -35,7 +40,7 @@ const AddEditReview = ({ productId, show, onClose, initialData = null }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (data) => {
       if (initialData) {
-        return await axios.patch(`/reviews/${initialData._id}`, data, {
+        return await axios.patch(`/reviews/${initialData.id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
@@ -46,6 +51,7 @@ const AddEditReview = ({ productId, show, onClose, initialData = null }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["add-edit-reviews"]);
+      onUpdated();
       handleCloseAndClearState();
     },
     onError: (error) => {
@@ -65,7 +71,7 @@ const AddEditReview = ({ productId, show, onClose, initialData = null }) => {
     for (const key in formData) {
       if (key === "images") {
         formData.images.forEach((file) => {
-          form.append("images", file); // ✅ append each file individually
+          form.append("images", file);
         });
       } else {
         form.append(key, formData[key]);
@@ -74,7 +80,6 @@ const AddEditReview = ({ productId, show, onClose, initialData = null }) => {
 
     mutate(form);
   };
-  console.log("Submitting files:", galleryImages);
 
   const handleCloseAndClearState = () => {
     onClose();
