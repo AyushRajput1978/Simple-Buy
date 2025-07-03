@@ -47,13 +47,13 @@ const Layout = () => {
   }, [authToken]);
 
   return (
-    <>
+    <div style={{ backgroundColor: "var(--color-light)", minHeight: "100vh" }}>
       <Navbar />
-      <main>
+      <main className="flex-grow-1 bg-custom-main">
         <Outlet />
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

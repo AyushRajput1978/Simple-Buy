@@ -1,19 +1,26 @@
 import Skeleton from "react-loading-skeleton";
 import { Link, useParams } from "react-router-dom";
 import Marquee from "react-fast-marquee";
-import { useDispatch } from "react-redux";
 import axios from "../axios";
 import { useQuery } from "@tanstack/react-query";
 import Reviews from "../components/Reviews";
 import RatingStars from "../utils/RatingStars";
+import ProductCard from "../components/layout/ProductCard";
+import useCart from "../hooks/useCart";
+import { useState } from "react";
+import CustomToast from "../components/layout/CustomToast";
+import { Col, Row } from "react-bootstrap";
 
 const Product = () => {
+  const [showToast, setShowToast] = useState(false);
+  const [toastBody, setToastBody] = useState("");
+  const [success, setSuccess] = useState(true);
   const { id } = useParams();
 
-  const dispatch = useDispatch();
+  const { addToCart } = useCart();
 
   const addProduct = (product) => {
-    dispatch(addItem(product));
+    addToCart(product.id, 1, setShowToast, setToastBody, setSuccess);
   };
 
   // get products functions
@@ -127,59 +134,32 @@ const Product = () => {
 
   const ShowSimilarProduct = () => {
     return (
-      <>
-        <div className="py-4 my-4">
-          <div className="d-flex">
-            {similarProducts.map((item) => {
-              return (
-                <div key={item.id} className="card mx-4 text-center">
-                  <img
-                    className="card-img-top p-3"
-                    src={item.image}
-                    alt="Card"
-                    height={300}
-                    width={300}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">
-                      {item.name.substring(0, 15)}...
-                    </h5>
-                  </div>
-                  <ul className="list-group list-group-flush">
-                    <li className="list-group-item lead">${item.price}</li>
-                  </ul>
-                  <div className="card-body">
-                    <Link
-                      to={"/product/" + item.id}
-                      className="btn btn-dark m-1"
-                    >
-                      Buy Now
-                    </Link>
-                    <button
-                      className="btn btn-dark m-1"
-                      onClick={() => addProduct(item)}
-                    >
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </>
+      <div className="py-4 my-4">
+        <Row className="g-4">
+          {similarProducts.map((product) => (
+            <Col key={product.id} md={4} sm={6} xs={12} className="d-flex">
+              <ProductCard product={product} addProduct={addProduct} />
+            </Col>
+          ))}
+        </Row>
+      </div>
     );
   };
 
   return (
-    <div className="container">
+    <div className="container my-5 py-4 px-4 rounded product-detail-section">
       <div className="row">
         {productLoading ? <ProductLoading /> : <ShowProduct />}
       </div>
       <div className="row my-5 py-5">
         <div className="d-none d-md-block">
           <h2 className="">You may also Like</h2>
-          <Marquee pauseOnHover={true} pauseOnClick={true} speed={50}>
+          <Marquee
+            pauseOnHover={true}
+            pauseOnClick={true}
+            speed={50}
+            autoFill={true}
+          >
             {simlarProductLoading ? (
               <SimilarProductsLoading />
             ) : (
@@ -197,6 +177,12 @@ const Product = () => {
           refetchProductDetail={refetchProductDetail}
         />
       )}
+      <CustomToast
+        show={showToast}
+        toastBody={toastBody}
+        setShow={setShowToast}
+        success={success}
+      />
     </div>
   );
 };

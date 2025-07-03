@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import {
+  Card,
+  Button,
+  Row,
+  Col,
+  Badge,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -11,6 +19,7 @@ import axios from "../axios";
 import { useQuery } from "@tanstack/react-query";
 import useCart from "../hooks/useCart";
 import CustomToast from "./layout/CustomToast";
+import ProductCard from "./layout/ProductCard";
 
 const Products = () => {
   const [filter, setFilter] = useState([]);
@@ -74,97 +83,58 @@ const Products = () => {
   const ShowProducts = () => {
     return (
       <>
-        <div className="buttons text-center py-5">
-          <button
-            className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => setFilter(data)}
-          >
-            All
-          </button>
-          <button
-            className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => filterProduct("Men's clothing")}
-          >
-            Men's Clothing
-          </button>
-          <button
-            className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => filterProduct("Women's clothing")}
-          >
-            Women's Clothing
-          </button>
-          <button
-            className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => filterProduct("Jewelery")}
-          >
-            Jewelery
-          </button>
-          <button
-            className="btn btn-outline-dark btn-sm m-2"
-            onClick={() => filterProduct("Electronics")}
-          >
-            Electronics
-          </button>
+        <div className="text-center py-4">
+          {[
+            "All",
+            "Men's clothing",
+            "Women's clothing",
+            "Jewelery",
+            "Electronics",
+          ].map((cat) => (
+            <Button
+              key={cat}
+              variant="outline-primary"
+              className="m-2 text-capitalize"
+              onClick={() =>
+                cat === "All" ? setFilter(data) : filterProduct(cat)
+              }
+            >
+              {cat}
+            </Button>
+          ))}
         </div>
 
-        {filter?.map((product) => {
-          return (
-            <div
-              id={product.id}
+        <Row className="g-4">
+          {filter?.map((product) => (
+            <Col
               key={product.id}
-              className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4"
+              md={6}
+              lg={4}
+              className="d-flex align-items-stretch"
             >
-              <div
-                className="product-card card text-center h-100 bg-light"
-                key={product.id}
-              >
-                <img
-                  className="card-img-top p-3"
-                  src={product.image}
-                  alt="Card"
-                  height={300}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">
-                    {product.name.substring(0, 12)}...
-                  </h5>
-                  <p className="card-text">
-                    {product.description.substring(0, 90)}...
-                  </p>
-                </div>
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item lead fw-bolder">
-                    $ {product.price}
-                  </li>
-                </ul>
-                <div className="card-body">
-                  <Link
-                    to={"/product/" + product.id}
-                    className="btn btn-dark m-1"
-                  >
-                    Buy Now
-                  </Link>
-                  <button
-                    className="btn btn-dark m-1"
-                    onClick={() => addProduct(product)}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+              <ProductCard product={product} addProduct={addProduct} />
+            </Col>
+          ))}
+        </Row>
       </>
     );
   };
+
   return (
     <>
-      <div className="container my-3 py-3">
+      <div className="container my-3 py-3 product-section">
         <div className="row">
           <div className="col-12">
-            <h2 className="display-5 text-center">Latest Products</h2>
-            <hr />
+            <h2 className="display-5 text-center text-primary">
+              Latest Products
+            </h2>
+            <hr
+              className="mx-auto"
+              style={{
+                width: "100px",
+                borderTop: "3px solid var(--color-accent)",
+              }}
+            />
           </div>
         </div>
         <div className="row justify-content-center">

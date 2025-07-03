@@ -49,6 +49,7 @@ const Reviews = ({
   const [editData, setEditData] = useState(null);
   const [toastState, dispatchToast] = useReducer(toastReducer, initialState);
   const [restrictAddReview, setRestrictAddReview] = useState(false);
+  const [restrictAddReviewMsg, setRestrictAddReviewMsg] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [reviewId, setReviewId] = useState(null);
 
@@ -58,7 +59,7 @@ const Reviews = ({
     if (restrictAddReview) {
       dispatchToast({
         type: "SHOW_TOAST",
-        payload: "You are allowed to add one review per product",
+        payload: restrictAddReviewMsg,
         success: false,
       });
       return;
@@ -102,21 +103,35 @@ const Reviews = ({
     setReviewId(null);
   };
   useEffect(() => {
-    reviews.forEach((review) => {
-      review.user.id === userData.id && setRestrictAddReview(true);
-    });
+    if (!userData) {
+      setRestrictAddReview(true);
+      setRestrictAddReviewMsg("Please login or signup to add a review");
+    }
+  }, [userData]);
+  useEffect(() => {
+    if (userData) {
+      reviews.forEach((review) => {
+        if (review.user.id === userData.id) {
+          setRestrictAddReview(true);
+          setRestrictAddReviewMsg(
+            "You are allowed to add one review per product"
+          );
+        }
+      });
+    }
   }, [reviews]);
   return (
     <Container className="my-5 reviews-container">
       <div className="text-center mb-5">
-        <h2 className="fw-bold">
+        <h2 className="fw-bold text-primary">
           Reviews <span className="fs-5 text-muted">({reviewsCount})</span>
         </h2>
         <h5 className="text-secondary mb-2">What Customers Think</h5>
         <div className="d-flex justify-content-center align-items-center">
           <RatingStars ratings={ratingsAverage} reviews={true} />
-          <span className="ms-2 fw-semibold">{ratingsAverage}</span>
+          <span className="ms-2 fw-semibold text-cta">{ratingsAverage}</span>
         </div>
+
         <p className="text-muted mt-2">
           Based on {reviewsCount} customer{reviewsCount !== 1 && "s"} reviews
         </p>
@@ -130,7 +145,7 @@ const Reviews = ({
         <Row className="g-4">
           {reviews.map((review) => (
             <Col md={6} key={review.id}>
-              <Card className="shadow-sm h-100">
+              <Card className="review-card h-100">
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <RatingStars ratings={review.rating} />
@@ -145,9 +160,15 @@ const Reviews = ({
                       roundedCircle
                       width={45}
                       height={45}
-                      className="me-2 border"
+                      className="me-3 border"
+                      style={{ objectFit: "cover" }}
                     />
-                    <strong>{review.user?.name}</strong>
+                    <div className="text-start">
+                      <strong className="d-block">{review.user?.name}</strong>
+                      <small className="text-muted">
+                        {format(new Date(review.createdAt), "dd MMM yyyy")}
+                      </small>
+                    </div>
                   </div>
 
                   <Card.Text className="text-dark">{review.comment}</Card.Text>
@@ -199,7 +220,7 @@ const Reviews = ({
       )}
 
       <div className="text-center mt-5">
-        <Button variant="dark" size="lg" onClick={handleAddReview}>
+        <Button variant="primary" size="lg" onClick={handleAddReview}>
           Write a Review
         </Button>
       </div>

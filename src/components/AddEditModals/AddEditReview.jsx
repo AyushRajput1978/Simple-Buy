@@ -88,13 +88,17 @@ const AddEditReview = ({
   };
 
   return (
-    <Modal show={show} onHide={handleCloseAndClearState} centered size="lg">
+    <Modal
+      show={show}
+      onHide={handleCloseAndClearState}
+      centered
+      size="lg"
+      className="review-modal"
+    >
       <Form onSubmit={handleSubmit}>
         <Modal.Header closeButton className="border-0 pb-0 mb-4">
-          <Modal.Title className="w-100 text-center">
-            <span className="d-flex justify-content-center align-items-center gap-2">
-              {initialData ? "Edit Review" : "Add Review"}
-            </span>
+          <Modal.Title className="w-100 text-center fs-4 fw-semibold text-primary">
+            {initialData ? "Edit Your Review ✏️" : "Write a Review 📝"}
           </Modal.Title>
         </Modal.Header>
 

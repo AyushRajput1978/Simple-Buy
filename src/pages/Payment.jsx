@@ -106,12 +106,15 @@ const Payment = () => {
 
       <Row className="justify-content-center">
         <Col md={6}>
-          <Card className="shadow-sm">
-            <Card.Header className="bg-white">
-              <h4 className="mb-0">Bill Summary</h4>
+          <Card className="shadow card-summary">
+            <Card.Header>
+              <h4 className="mb-0">Payment Summary</h4>
             </Card.Header>
-            <Card.Body style={{ backgroundColor: "#f9f9f9" }}>
-              <p className="mb-4">Enter your payment details</p>
+            <Card.Body className="payment-summary">
+              <p className="mb-4 text-muted">
+                Enter your payment details below
+              </p>
+
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label>Name on Card</Form.Label>
@@ -124,21 +127,14 @@ const Payment = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3">
+                <Form.Group className="mb-4">
                   <Form.Label>Card Details</Form.Label>
-                  <div
-                    style={{
-                      padding: "10px 12px",
-                      border: "1px solid #ced4da",
-                      borderRadius: "0.375rem",
-                      backgroundColor: "#fff",
-                    }}
-                  >
+                  <div className="stripe-input">
                     <CardElement options={CARD_ELEMENT_OPTIONS} />
                   </div>
                 </Form.Group>
 
-                <div className="mb-3">
+                <div className="mb-4">
                   <p>
                     <strong>Subtotal:</strong> ${subtotal.toFixed(2)}
                   </p>
@@ -153,12 +149,12 @@ const Payment = () => {
                 <Button
                   type="submit"
                   disabled={processing}
-                  className="w-100"
-                  variant="primary"
+                  className="w-100 btn-cta"
                 >
                   {processing ? "Processing..." : `Pay $${total.toFixed(2)}`}
                 </Button>
               </Form>
+
               {error && <div className="text-danger mt-3">{error}</div>}
             </Card.Body>
           </Card>

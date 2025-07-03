@@ -25,7 +25,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
+    <nav className="navbar navbar-expand-lg custom-navbar py-3 sticky-top">
       <div className="container">
         <button
           className="navbar-toggler mx-2"
@@ -41,7 +41,7 @@ const Navbar = () => {
         <NavLink className="navbar-brand fw-bold fs-4 px-2" to="/">
           <img
             className="card-img img-fluid"
-            src="./assets/logo.png"
+            src="./assets/logo.webp"
             alt="Logo"
             style={{ height: "4rem" }}
           />
@@ -76,7 +76,7 @@ const Navbar = () => {
             {/* User Avatar */}
             <NavLink to="/cart" className="nav-link position-relative">
               <FaCartShopping className="fs-5" />
-              <span className="badge badge-dark position-absolute top-2 start-100 translate-middle">
+              <span className="badge cart-badge position-absolute top-2 start-100 translate-middle">
                 {cart.length}
               </span>
             </NavLink>
@@ -132,13 +132,21 @@ const Navbar = () => {
               <>
                 <NavLink
                   to="/login"
-                  className="btn btn-outline-dark btn-sm mx-1 mt-2 mt-lg-0"
+                  className="btn btn-sm mx-1 mt-2 mt-lg-0"
+                  style={{
+                    backgroundColor: "var(--color-cta)",
+                    color: "white",
+                  }}
                 >
                   <i className="fa fa-sign-in-alt mr-1"></i> Login
                 </NavLink>
                 <NavLink
                   to="/register"
-                  className="btn btn-outline-dark btn-sm mx-1 mt-2 mt-lg-0"
+                  className="btn btn-outline-light btn-sm mx-1 mt-2 mt-lg-0"
+                  style={{
+                    borderColor: "var(--color-cta)",
+                    color: "var(--color-cta)",
+                  }}
                 >
                   <i className="fa fa-user-plus mr-1"></i> Register
                 </NavLink>

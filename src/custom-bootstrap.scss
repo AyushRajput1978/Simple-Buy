@@ -1,0 +1,8 @@
+// STEP 1: Override Bootstrap variables BEFORE importing bootstrap
+$primary: #2c3e50; // Midnight Blue
+$secondary: #1abc9c; // Turquoise
+$light: #ecf0f1; // Light Gray
+$warning: #e67e22; // Orange (used for CTA)
+$dark: #34495e; // Charcoal
+$accent: #9b59b6; // STEP 2: Import Bootstrap
+@import "bootstrap/scss/bootstrap";

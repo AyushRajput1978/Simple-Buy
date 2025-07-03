@@ -51,7 +51,7 @@ const DashboardLayout = () => {
         <NavLink className="navbar-brand fw-bold fs-4" to="/">
           <img
             className="card-img img-fluid"
-            src="./assets/logo.png"
+            src="./assets/logo.webp"
             alt="Logo"
             style={{
               height: collapsed ? "1em" : "2em",

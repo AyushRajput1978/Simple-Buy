@@ -29,3 +29,48 @@
   background-color: #495057;
   transform: scale(1.05);
 }
+
+/* Main */
+.bg-custom-main {
+  background-color: var(--color-light);
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Navbar */
+.custom-navbar {
+  background-color: var(--color-primary) !important;
+}
+
+.custom-navbar .nav-link {
+  color: var(--color-light) !important;
+  transition: color 0.3s ease;
+}
+
+.custom-navbar .nav-link:hover,
+.custom-navbar .nav-link.active {
+  color: var(--color-accent) !important;
+  font-weight: 500;
+}
+
+.custom-navbar .navbar-brand img {
+  filter: brightness(0) invert(1);
+}
+
+.custom-navbar .dropdown-menu {
+  background-color: #ffffff;
+}
+
+.custom-navbar .dropdown-item {
+  color: var(--color-text);
+}
+
+.custom-navbar .dropdown-item:hover {
+  background-color: var(--color-light);
+  color: var(--color-accent);
+}
+
+.cart-badge {
+  background-color: var(--color-cta);
+  color: white;
+}
