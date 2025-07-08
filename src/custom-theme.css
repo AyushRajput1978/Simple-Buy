@@ -36,6 +36,7 @@ a:hover {
 }
 .btn-cta:hover {
   background-color: darken(var(--color-cta), 5%);
+  color: #3a3a3a;
 }
 
 /* Card header */

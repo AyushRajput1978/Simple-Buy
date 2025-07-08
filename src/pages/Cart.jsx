@@ -35,7 +35,6 @@ const Cart = () => {
   const removeItem = (product) => {
     updateCart(product.id, "decrement", setShowToast, setToastBody, setSuccess);
   };
-
   const ShowCart = () => {
     let subtotal = 0;
     let shipping = 30.0;

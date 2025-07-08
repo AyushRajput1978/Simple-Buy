@@ -64,10 +64,15 @@
 .custom-navbar .dropdown-item {
   color: var(--color-text);
 }
+.custom-navbar .dropdown-item.active {
+  background-color: var(--color-accent);
+  color: var(--color-light) !important;
+  font-weight: 500;
+}
 
 .custom-navbar .dropdown-item:hover {
-  background-color: var(--color-light);
-  color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: var(--color-light) !important;
 }
 
 .cart-badge {

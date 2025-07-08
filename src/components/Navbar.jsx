@@ -25,7 +25,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg custom-navbar py-3 sticky-top">
+    <nav className="navbar navbar-expand-lg custom-navbar navbar-dark py-3 sticky-top">
       <div className="container">
         <button
           className="navbar-toggler mx-2"
@@ -71,7 +71,6 @@ const Navbar = () => {
             </li>
           </ul>
 
-          {/* Move this inside navbar-collapse and use flex utilities */}
           <div className="navbar-nav d-flex align-items-center justify-content-center gap-3 mt-3 mt-lg-0">
             {/* User Avatar */}
             <NavLink to="/cart" className="nav-link position-relative">
@@ -100,7 +99,9 @@ const Navbar = () => {
                     aria-haspopup="true"
                     aria-expanded="false"
                   />
-                  <div className="small mt-1">{user.name || "User"}</div>
+                  <div className="small mt-1 text-white">
+                    {user.name || "User"}
+                  </div>
 
                   <div
                     className="dropdown-menu dropdown-menu-right"
