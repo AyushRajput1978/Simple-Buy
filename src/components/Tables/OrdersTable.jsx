@@ -12,42 +12,18 @@ import {
   Row,
 } from "react-bootstrap";
 import { useReducer, useState } from "react";
-import CustomToast from "../layout/CustomToast";
-import TableLoading from "../layout/TableLoading";
 import {
   FaCheckCircle,
   FaTruck,
   FaBoxOpen,
   FaRegCheckSquare,
 } from "react-icons/fa";
+import { TableLoadingShimmer } from "../layout/LoadingShimmers";
+import { toast } from "../../utils/helper";
 
 const OrdersTable = () => {
-  // Toast
-  // Reducer for toast state
-  const initialState = {
-    showToast: false,
-    toastBody: "",
-    success: true,
-  };
-
-  const toastReducer = (state, action) => {
-    switch (action.type) {
-      case "SHOW_TOAST":
-        return {
-          ...state,
-          showToast: true,
-          toastBody: action.payload,
-          success: action.success,
-        };
-      case "HIDE_TOAST":
-        return { ...state, showToast: false };
-      default:
-        return state;
-    }
-  };
   //   const [showModal, setShowModal] = useState(false);
   //   const [initialData, setInitialData] = useState(null);
-  const [toastState, dispatchToast] = useReducer(toastReducer, initialState);
   const [loading, setLoading] = useState(false);
 
   // Functions
@@ -65,20 +41,12 @@ const OrdersTable = () => {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      const res = await axios.delete(`/dashboard/orders/${id}`);
+      await axios.delete(`/dashboard/orders/${id}`);
       //  Show success toast
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: "Order deleted successfully",
-        success: true,
-      });
+      toast("Order deleted successfully");
       refetchOrders();
     } catch (err) {
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: err.response.data.message || "Something went wrong",
-        success: false,
-      });
+      toast(err.response.data.message || "Something went wrong", false);
     } finally {
       setLoading(false);
     }
@@ -95,7 +63,7 @@ const OrdersTable = () => {
   });
 
   if (isLoading || loading) {
-    return <TableLoading heading="Product" />;
+    return <TableLoadingShimmer heading="Product" />;
   }
   const statuses = [
     {
@@ -224,13 +192,6 @@ const OrdersTable = () => {
           </Row>
         )}
       </Card.Body>
-
-      <CustomToast
-        show={toastState.showToast}
-        toastBody={toastState.toastBody}
-        setShow={() => dispatchToast({ type: "HIDE_TOAST" })}
-        success={toastState.success}
-      />
     </Card>
   );
 };

@@ -3,7 +3,7 @@ import { Button, Modal } from "react-bootstrap";
 const ConfirmModal = ({
   showConfirmModal,
   setShowConfirmModal,
-  handleClearConfirm,
+  handleConfirmClear,
   heading,
   bodyText,
   confirmText,
@@ -22,7 +22,7 @@ const ConfirmModal = ({
         <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
           Cancel
         </Button>
-        <Button variant="danger" onClick={handleClearConfirm}>
+        <Button variant="danger" onClick={handleConfirmClear}>
           {confirmText}
         </Button>
       </Modal.Footer>

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useCart from "../hooks/useCart";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
-import CustomToast from "../components/layout/CustomToast";
 
 const CARD_ELEMENT_OPTIONS = {
   style: {
@@ -24,9 +23,6 @@ const CARD_ELEMENT_OPTIONS = {
 };
 
 const Payment = () => {
-  const [showToast, setShowToast] = useState(false);
-  const [toastBody, setToastBody] = useState("");
-  const [success, setSuccess] = useState(true);
   const { cart, fetchCart } = useCart();
   const stripe = useStripe();
   const elements = useElements();
@@ -82,9 +78,7 @@ const Payment = () => {
         setError(result.error.message);
         setProcessing(false);
       } else if (result.paymentIntent.status === "succeeded") {
-        setShowToast(true);
-        setToastBody("Payment Successful");
-        setSuccess(true);
+        toast("Payment Successful");
         fetchCart();
         setTimeout(() => navigate("/"), 3000);
       }
@@ -97,13 +91,6 @@ const Payment = () => {
 
   return (
     <Container className="py-5">
-      <CustomToast
-        show={showToast}
-        toastBody={toastBody}
-        setShow={setShowToast}
-        success={success}
-      />
-
       <Row className="justify-content-center">
         <Col md={6}>
           <Card className="shadow card-summary">

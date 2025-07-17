@@ -1,39 +1,46 @@
 import { Link } from "react-router-dom";
-import useCart from "../hooks/useCart";
 import { useState } from "react";
-import CustomToast from "../components/layout/CustomToast";
-import { Button } from "react-bootstrap";
-import ConfirmModal from "../components/layout/AlertModal";
+import { FaArrowLeft } from "react-icons/fa6";
 import { useSelector } from "react-redux";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Row,
+} from "react-bootstrap";
+
+import useCart from "../hooks/useCart";
+import ConfirmModal from "../components/layout/AlertModal";
 
 const Cart = () => {
   const { cart, deleteCart, updateCart } = useCart();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastBody, setToastBody] = useState("");
-  const [success, setSuccess] = useState(true);
 
   const userData = useSelector((state) => state.auth.user);
+
   const EmptyCart = () => {
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12 py-5 bg-light text-center">
-            <h4 className="p-3 display-5">Your Cart is Empty</h4>
+      <Container>
+        <Row>
+          <Col className="py-5 bg-light text-center">
+            <h2 className="p-3">Your Cart is Empty</h2>
             <Link to="/" className="btn  btn-outline-dark mx-4">
-              <i className="fa fa-arrow-left"></i> Continue Shopping
+              <FaArrowLeft /> Continue Shopping
             </Link>
-          </div>
-        </div>
-      </div>
+          </Col>
+        </Row>
+      </Container>
     );
   };
 
   const addItem = (product) => {
-    updateCart(product.id, "increment", setShowToast, setToastBody, setSuccess);
+    updateCart(product.id, "increment");
   };
   const removeItem = (product) => {
-    updateCart(product.id, "decrement", setShowToast, setToastBody, setSuccess);
+    updateCart(product.id, "decrement");
   };
   const ShowCart = () => {
     let subtotal = 0;
@@ -45,19 +52,21 @@ const Cart = () => {
       totalItems += item.quantity;
     });
 
-    const handleClearConfirm = () => {
-      deleteCart(setShowToast, setToastBody, setSuccess);
+    const handleConfirmClear = () => {
+      deleteCart();
       setShowConfirmModal(false);
     };
 
     return (
-      <section className="py-4">
-        <div className="row justify-content-center gx-5">
+      <Container className="py-4">
+        <Row className=" justify-content-center gx-5">
           {/* Cart Items */}
-          <div className="col-lg-8">
-            <div className="card shadow-sm rounded-4 mb-4 border-0">
-              <div className="card-header d-flex justify-content-between align-items-center bg-white border-0">
-                <h5 className="mb-0 fw-semibold text-primary">Items in Cart</h5>
+          <Col lg={8}>
+            <Card className="mb-4 rounded-4 border-0">
+              <CardHeader className="d-flex justify-content-between align-items-center bg-white border-0">
+                <h2 className="mb-0 fw-semibold text-primary fs-5">
+                  Items in Cart
+                </h2>
                 <Button
                   variant="outline-danger"
                   size="sm"
@@ -65,28 +74,31 @@ const Cart = () => {
                 >
                   Clear Cart
                 </Button>
-              </div>
-              <div className="card-body">
+              </CardHeader>
+              <CardBody>
                 {cart.map((item) => (
                   <div key={item.product.id}>
-                    <div className="row align-items-center mb-4">
-                      <div className="col-md-2 col-4">
+                    <Row className="align-items-center mb-4">
+                      <Col md={2} xs={4}>
                         <img
                           src={item.product.image}
                           alt={item.product.name}
                           className="img-fluid rounded border"
                           style={{ height: "75px", objectFit: "contain" }}
                         />
-                      </div>
+                      </Col>
 
-                      <div className="col-md-4 col-8">
-                        <h6 className="mb-1">{item.product.name}</h6>
+                      <Col md={4} xs={8}>
+                        <h3 className="mb-1 fs-6">{item.product.name}</h3>
                         <small className="text-muted">
                           ${item.product.price} × {item.quantity}
                         </small>
-                      </div>
+                      </Col>
 
-                      <div className="col-md-6 mt-2 mt-md-0 d-flex align-items-center justify-content-md-end">
+                      <Col
+                        md={6}
+                        className="mt-2 mt-md-0 d-flex align-items-center justify-content-md-end"
+                      >
                         <div className="d-flex align-items-center border rounded-3 overflow-hidden">
                           <Button
                             variant="light"
@@ -106,22 +118,22 @@ const Cart = () => {
                             <i className="fas fa-plus" />
                           </Button>
                         </div>
-                      </div>
-                    </div>
+                      </Col>
+                    </Row>
                     <hr />
                   </div>
                 ))}
-              </div>
-            </div>
-          </div>
+              </CardBody>
+            </Card>
+          </Col>
 
           {/* Order Summary */}
-          <div className="col-lg-4">
-            <div className="card shadow-sm rounded-4 border-0">
-              <div className="card-header bg-light border-0">
-                <h5 className="mb-0 fw-semibold">Order Summary</h5>
-              </div>
-              <div className="card-body">
+          <Col lg={4}>
+            <Card className="rounded-4 border-0">
+              <CardHeader className="bg-light border-0">
+                <h2 className="mb-0 fw-semibold fs-5">Order Summary</h2>
+              </CardHeader>
+              <CardBody>
                 <ul className="list-group list-group-flush mb-4">
                   <li className="list-group-item d-flex justify-content-between">
                     <span>Products ({totalItems})</span>
@@ -144,27 +156,19 @@ const Cart = () => {
                 >
                   Go to Checkout
                 </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Toast + Modal */}
-        <CustomToast
-          show={showToast}
-          toastBody={toastBody}
-          setShow={setShowToast}
-          success={success}
-        />
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
         <ConfirmModal
           showConfirmModal={showConfirmModal}
           setShowConfirmModal={setShowConfirmModal}
-          handleClearConfirm={handleClearConfirm}
+          handleConfirmClear={handleConfirmClear}
           heading="Confirm Clear Cart"
           bodyText="Are you sure you want to clear all items from your cart?"
           confirmText="Yes, Clear Cart"
         />
-      </section>
+      </Container>
     );
   };
 

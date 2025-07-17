@@ -1,8 +1,27 @@
-import { Card, Table } from "react-bootstrap";
+import { Card, Col, Row, Table } from "react-bootstrap";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-const TableLoading = () => {
+export function ProductsLoadingShimmer() {
+  return (
+    <>
+      <Row className="justify-content-center">
+        <Col sm={6} className=" py-5 text-center">
+          <Skeleton height={40} />
+        </Col>
+      </Row>
+      <Row>
+        {[...Array(12)].map((ind) => (
+          <Col md={4} sm={6} key={ind} className="mb-4">
+            <Skeleton height={592} />
+          </Col>
+        ))}
+      </Row>
+    </>
+  );
+}
+
+export function TableLoadingShimmer() {
   const tableRows = [...Array(10).keys()];
   const columns = [
     { width: 50 },
@@ -58,6 +77,4 @@ const TableLoading = () => {
       </Card.Body>
     </Card>
   );
-};
-
-export default TableLoading;
+}

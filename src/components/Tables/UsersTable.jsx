@@ -1,38 +1,13 @@
 import axios from "../../axios";
 import { useQuery } from "@tanstack/react-query";
-import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
-import { useReducer, useState } from "react";
-import CustomToast from "../layout/CustomToast";
-import TableLoading from "../layout/TableLoading";
+import { useState } from "react";
+import { TableLoadingShimmer } from "../layout/LoadingShimmers";
+import { toast } from "../../utils/helper";
 
 const UsersTable = () => {
-  // Toast
-  // Reducer for toast state
-  const initialState = {
-    showToast: false,
-    toastBody: "",
-    success: true,
-  };
-
-  const toastReducer = (state, action) => {
-    switch (action.type) {
-      case "SHOW_TOAST":
-        return {
-          ...state,
-          showToast: true,
-          toastBody: action.payload,
-          success: action.success,
-        };
-      case "HIDE_TOAST":
-        return { ...state, showToast: false };
-      default:
-        return state;
-    }
-  };
-  const [toastState, dispatchToast] = useReducer(toastReducer, initialState);
   const [loading, setLoading] = useState(false);
 
   // Functions
@@ -46,18 +21,10 @@ const UsersTable = () => {
     try {
       await axios.delete(`/dashboard/users/${id}`);
       //  Show success toast
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: "User deleted successfully",
-        success: true,
-      });
+      toast("User deleted successfully");
       refetchProducts();
     } catch (err) {
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: err.response.data.message || "Something went wrong",
-        success: false,
-      });
+      toast(err.response.data.message || "Something went wrong", false);
     } finally {
       setLoading(false);
     }
@@ -74,7 +41,7 @@ const UsersTable = () => {
   });
 
   if (isLoading || loading) {
-    return <TableLoading />;
+    return <TableLoadingShimmer />;
   }
 
   return (
@@ -148,13 +115,6 @@ const UsersTable = () => {
           </Row>
         )}
       </Card.Body>
-
-      <CustomToast
-        show={toastState.showToast}
-        toastBody={toastState.toastBody}
-        setShow={() => dispatchToast({ type: "HIDE_TOAST" })}
-        success={toastState.success}
-      />
     </Card>
   );
 };

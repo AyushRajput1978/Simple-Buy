@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "../axios";
+import { Button, Col, Container, Row } from "react-bootstrap";
 
 const ForgotPassword = () => {
   const resetUrl = `${import.meta.env.VITE_SITE_URL}/password-reset`;
@@ -21,11 +22,11 @@ const ForgotPassword = () => {
     }
   };
   return (
-    <div className="container my-3 py-3">
+    <Container className="my-3 py-3">
       <h1 className="text-center">Recover Password</h1>
       <hr />
-      <div className="row my-4 h-100">
-        <div className="col-md-4 col-lg-4 col-sm-8 mx-auto">
+      <Row className="my-4 h-100">
+        <Col md={4} sm={8} className="mx-auto">
           <form onSubmit={submitHandler}>
             <div className="my-3">
               <label htmlFor="email">Email address</label>
@@ -39,18 +40,19 @@ const ForgotPassword = () => {
               />
             </div>
             <div className="text-center">
-              <button
-                className="my-2 mx-auto btn btn-dark"
+              <Button
+                variant="dark"
+                className="my-2 mx-auto"
                 type="submit"
                 disabled={isLoading}
               >
                 {isLoading ? "Submitting..." : "Submit"}
-              </button>
+              </Button>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 export default ForgotPassword;

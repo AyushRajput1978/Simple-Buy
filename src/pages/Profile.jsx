@@ -8,20 +8,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "../axios";
 
 import ImageUploader from "../components/layout/ImageUploader";
-import CustomToast from "../components/layout/CustomToast";
 import AddressCard from "../components/layout/AddressCard";
 import AddEditAddress from "../components/AddEditModals/AddEditAddress";
-import { handleChange } from "../utils/helper";
+import { handleChange, toast } from "../utils/helper";
 
 const MyProfile = () => {
   const [profileImage, setProfileImage] = useState("");
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [editAddress, setEditAddress] = useState({});
-
-  //customtoast states
-  const [showToast, setShowToast] = useState(false);
-  const [toastBody, setToastBody] = useState("");
-  const [success, setSuccess] = useState(true);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -63,16 +57,11 @@ const MyProfile = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["update-loggedin-user"]);
-      console.log("ye chala");
-      setShowToast(true);
-      setToastBody("Profile updated successfully");
-      setSuccess(true);
+      toast("Profile updated successfully");
     },
     onError: (error) => {
       console.error("Failed to submit:", error);
-      setShowToast(true);
-      setToastBody(err.response?.data?.message || "Error updating profile");
-      setSuccess(false);
+      toast(err.response?.data?.message || "Error updating profile", false);
     },
   });
   const handleSubmit = async (e) => {
@@ -86,9 +75,7 @@ const MyProfile = () => {
 
     setError(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      setShowToast(true);
-      setToastBody("Please fill all the mandatory fields");
-      setSuccess(false);
+      toast("Please fill all the mandatory fields", false);
       return;
     }
     const form = new FormData();
@@ -99,28 +86,6 @@ const MyProfile = () => {
     }
     form.append("photo", profileImage);
     mutate(form);
-    // try {
-    //   setLoading(true);
-    //   const res = await axios({
-    //     method: "PATCH",
-    //     url: "/user/update-me",
-    //     data: form,
-    //     headers: {
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //   });
-
-    //   setShowToast(true);
-    //   setToastBody("Profile updated successfully");
-    //   setSuccess(true);
-    // } catch (err) {
-    //   console.error(err);
-    //   setShowToast(true);
-    //   setToastBody(err.response?.data?.message || "Error updating profile");
-    //   setSuccess(false);
-    // } finally {
-    //   setLoading(false);
-    // }
   };
   return (
     <>
@@ -246,12 +211,6 @@ const MyProfile = () => {
           }))
         }
         data={editAddress}
-      />
-      <CustomToast
-        show={showToast}
-        toastBody={toastBody}
-        setShow={setShowToast}
-        success={success}
       />
     </>
   );

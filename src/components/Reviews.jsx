@@ -9,12 +9,12 @@ import {
   Row,
   Stack,
 } from "react-bootstrap";
-import { useEffect, useReducer, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import AddEditReview from "./AddEditModals/AddEditReview";
 import axios from "../axios";
-import CustomToast from "./layout/CustomToast";
 import { useSelector } from "react-redux";
 import ConfirmModal from "./layout/AlertModal";
+import { toast } from "../utils/helper";
 
 const Reviews = ({
   productId,
@@ -23,31 +23,8 @@ const Reviews = ({
   ratingsAverage,
   refetchProductDetail,
 }) => {
-  const initialState = {
-    showToast: false,
-    toastBody: "",
-    success: true,
-  };
-
-  const toastReducer = (state, action) => {
-    switch (action.type) {
-      case "SHOW_TOAST":
-        return {
-          ...state,
-          showToast: true,
-          toastBody: action.payload,
-          success: action.success,
-        };
-      case "HIDE_TOAST":
-        return { ...state, showToast: false };
-      default:
-        return state;
-    }
-  };
-
   const [openReviewModal, setOpenReviewModal] = useState(false);
   const [editData, setEditData] = useState(null);
-  const [toastState, dispatchToast] = useReducer(toastReducer, initialState);
   const [restrictAddReview, setRestrictAddReview] = useState(false);
   const [restrictAddReviewMsg, setRestrictAddReviewMsg] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -57,11 +34,7 @@ const Reviews = ({
 
   const handleAddReview = () => {
     if (restrictAddReview) {
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: restrictAddReviewMsg,
-        success: false,
-      });
+      toast(restrictAddReviewMsg, false);
       return;
     }
     setEditData(null);
@@ -82,19 +55,11 @@ const Reviews = ({
   const deleteReview = async (id) => {
     try {
       await axios.delete(`/reviews/${id}`);
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: "Review deleted successfully",
-        success: true,
-      });
+      toast("Review deleted successfully");
       refetchProductDetail();
     } catch (err) {
       console.error(err);
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: err.response?.data?.message || "Something went wrong",
-        success: false,
-      });
+      toast(err.response?.data?.message || "Something went wrong", false);
     }
   };
   const handleConfirmDelete = () => {
@@ -126,15 +91,22 @@ const Reviews = ({
         <h2 className="fw-bold text-primary">
           Reviews <span className="fs-5 text-muted">({reviewsCount})</span>
         </h2>
-        <h5 className="text-secondary mb-2">What Customers Think</h5>
-        <div className="d-flex justify-content-center align-items-center">
-          <RatingStars ratings={ratingsAverage} reviews={true} />
-          <span className="ms-2 fw-semibold text-cta">{ratingsAverage}</span>
-        </div>
+        {Boolean(reviewsCount) && (
+          <Fragment>
+            <h5 className="text-secondary mb-2">What Customers Think</h5>
+            <div className="d-flex justify-content-center align-items-center">
+              <RatingStars ratings={ratingsAverage} reviews={true} />
+              <span className="ms-2 fw-semibold text-cta">
+                {ratingsAverage}
+              </span>
+            </div>
 
-        <p className="text-muted mt-2">
-          Based on {reviewsCount} customer{reviewsCount !== 1 && "s"} reviews
-        </p>
+            <p className="text-muted mt-2">
+              Based on {reviewsCount} customer{reviewsCount !== 1 && "s"}{" "}
+              reviews
+            </p>
+          </Fragment>
+        )}
       </div>
 
       {reviews?.length === 0 ? (
@@ -235,16 +207,10 @@ const Reviews = ({
       <ConfirmModal
         showConfirmModal={showConfirmModal}
         setShowConfirmModal={setShowConfirmModal}
-        handleClearConfirm={handleConfirmDelete}
+        handleConfirmClear={handleConfirmDelete}
         heading="Confirm Delete Review"
         bodyText="Are you sure you want to your review?"
         confirmText="Yes, delete review"
-      />
-      <CustomToast
-        show={toastState.showToast}
-        toastBody={toastState.toastBody}
-        setShow={() => dispatchToast({ type: "HIDE_TOAST" })}
-        success={toastState.success}
       />
     </Container>
   );

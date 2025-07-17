@@ -1,6 +1,7 @@
 import axios from "../axios";
 import { useDispatch, useSelector } from "react-redux";
 import { cartItemsSet } from "../redux/reducer/cartSlice";
+import { toast } from "../utils/helper";
 
 const useCart = () => {
   const dispatch = useDispatch();
@@ -15,13 +16,7 @@ const useCart = () => {
     }
   };
 
-  const addToCart = async (
-    productId,
-    quantity,
-    setShowToast,
-    setToastBody,
-    setSuccess
-  ) => {
+  const addToCart = async (productId, quantity) => {
     try {
       const res = await axios({
         method: "post",
@@ -35,21 +30,14 @@ const useCart = () => {
       });
 
       fetchCart();
-      setShowToast(true);
-      setToastBody("Product added successfully");
-      setSuccess(true);
+      toast("Product added successfully");
     } catch (err) {
-      setShowToast(true);
-      setToastBody(err.response?.data?.message || "Error adding to cart.");
-      setSuccess(false);
+      toast(err.response?.data?.message || "Error adding to cart.", false);
     }
   };
   const updateCart = async (
     productId,
-    action,
-    setShowToast,
-    setToastBody,
-    setSuccess
+    action
     // variantId
   ) => {
     try {
@@ -63,13 +51,9 @@ const useCart = () => {
       });
 
       fetchCart();
-      setShowToast(true);
-      setToastBody("Product updated successfully");
-      setSuccess(true);
+      toast("Product updated successfully");
     } catch (err) {
-      setShowToast(true);
-      setToastBody(err.response?.data?.message || "Error adding to cart.");
-      setSuccess(false);
+      toast(err.response?.data?.message || "Error adding to cart.", false);
     }
   };
 
@@ -167,17 +151,16 @@ const useCart = () => {
   //       dispatch(loadingSet(false));
   //     }
   //   };
-  const deleteCart = async (setShowToast, setToastBody, setSuccess) => {
+  const deleteCart = async () => {
     try {
       const res = await axios({
         method: "post",
         url: "/cart/clear",
       });
       fetchCart();
+      toast("Cart is cleared successfully");
     } catch (err) {
-      setShowToast(true);
-      setToastBody(err.response.data.message);
-      setSuccess(false);
+      toast(err.response.data.message, false);
     }
   };
 

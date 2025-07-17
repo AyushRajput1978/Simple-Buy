@@ -18,14 +18,15 @@ import {
   Cart,
   Login,
   Register,
-  Checkout,
   PageNotFound,
+  ForgotPassword,
+  ResetPassword,
+  Payment,
+  MyProfile,
 } from "./pages";
 import Layout from "./components/Layout";
 import ErrorBoundary from "./components/Errorboundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
 import DashboardHome from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import DashboardLayout from "./components/dashboardLayout";
@@ -35,9 +36,8 @@ import DashboardProducts from "./pages/Dashboard/Products";
 import DashboardUsers from "./pages/Dashboard/Users";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import Payment from "./pages/Payment";
 import DashboardOrders from "./pages/Dashboard/Orders";
-import MyProfile from "./pages/Profile";
+import CustomToast from "./components/layout/CustomToast";
 
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -50,6 +50,7 @@ root.render(
           <ErrorBoundary>
             <BrowserRouter>
               <Elements stripe={stripePromise}>
+                <CustomToast />
                 <Routes>
                   <Route element={<Layout />}>
                     <Route path="/" element={<Home />} />
@@ -59,7 +60,6 @@ root.render(
                     <Route path="/contact" element={<ContactPage />} />
                     <Route path="/profile" element={<MyProfile />} />
                     {/* Order related routes */}
-                    <Route path="/checkout" element={<Checkout />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/payment" element={<Payment />} />
                     {/* Authentication related routes */}

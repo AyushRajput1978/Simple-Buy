@@ -3,46 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
-import {
-  Table,
-  Spinner,
-  Dropdown,
-  Card,
-  ButtonGroup,
-  Image,
-} from "react-bootstrap";
+import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
 import { useReducer, useState } from "react";
 import AddEditProductModal from "../AddEditModals/AddEditProductModal";
-import CustomToast from "../layout/CustomToast";
-import TableLoading from "../layout/TableLoading";
+import { TableLoadingShimmer } from "../layout/LoadingShimmers";
+import { toast } from "../../utils/helper";
 
 const ProductsTable = () => {
-  // Toast
-  // Reducer for toast state
-  const initialState = {
-    showToast: false,
-    toastBody: "",
-    success: true,
-  };
-
-  const toastReducer = (state, action) => {
-    switch (action.type) {
-      case "SHOW_TOAST":
-        return {
-          ...state,
-          showToast: true,
-          toastBody: action.payload,
-          success: action.success,
-        };
-      case "HIDE_TOAST":
-        return { ...state, showToast: false };
-      default:
-        return state;
-    }
-  };
   const [showModal, setShowModal] = useState(false);
   const [initialData, setInitialData] = useState(null);
-  const [toastState, dispatchToast] = useReducer(toastReducer, initialState);
   const [loading, setLoading] = useState(false);
 
   // Functions
@@ -60,18 +29,10 @@ const ProductsTable = () => {
     try {
       const res = await axios.delete(`/dashboard/products/${id}`);
       //  Show success toast
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: "Product deleted successfully",
-        success: true,
-      });
+      toast("Product deleted successfully");
       refetchProducts();
     } catch (err) {
-      dispatchToast({
-        type: "SHOW_TOAST",
-        payload: err.response.data.message || "Something went wrong",
-        success: false,
-      });
+      toast(err.response.data.message || "Something went wrong", false);
     } finally {
       setLoading(false);
     }
@@ -88,7 +49,7 @@ const ProductsTable = () => {
   });
 
   if (isLoading || loading) {
-    return <TableLoading heading="Product" />;
+    return <TableLoadingShimmer heading="Product" />;
   }
 
   return (
@@ -183,12 +144,6 @@ const ProductsTable = () => {
           setEditId(null);
         }}
         initialData={initialData}
-      />
-      <CustomToast
-        show={toastState.showToast}
-        toastBody={toastState.toastBody}
-        setShow={() => dispatchToast({ type: "HIDE_TOAST" })}
-        success={toastState.success}
       />
     </Card>
   );

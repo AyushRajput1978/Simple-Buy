@@ -1,3 +1,6 @@
+import { store } from "../redux/store";
+import { showToast } from "../redux/reducer/toastSlice";
+
 export const valuehandler = (arr, value) =>
   arr?.find((opt) => opt.value === value);
 
@@ -26,4 +29,8 @@ export const handleChange = (e, setFormData) => {
       [name]: value || "",
     }));
   }
+};
+
+export const toast = (message, success = true) => {
+  store.dispatch(showToast({ message, success }));
 };

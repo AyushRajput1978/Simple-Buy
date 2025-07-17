@@ -8,19 +8,15 @@ import RatingStars from "../utils/RatingStars";
 import ProductCard from "../components/layout/ProductCard";
 import useCart from "../hooks/useCart";
 import { useState } from "react";
-import CustomToast from "../components/layout/CustomToast";
 import { Col, Row } from "react-bootstrap";
 
 const Product = () => {
-  const [showToast, setShowToast] = useState(false);
-  const [toastBody, setToastBody] = useState("");
-  const [success, setSuccess] = useState(true);
   const { id } = useParams();
 
   const { addToCart } = useCart();
 
   const addProduct = (product) => {
-    addToCart(product.id, 1, setShowToast, setToastBody, setSuccess);
+    addToCart(product.id, 1);
   };
 
   // get products functions
@@ -177,12 +173,6 @@ const Product = () => {
           refetchProductDetail={refetchProductDetail}
         />
       )}
-      <CustomToast
-        show={showToast}
-        toastBody={toastBody}
-        setShow={setShowToast}
-        success={success}
-      />
     </div>
   );
 };
