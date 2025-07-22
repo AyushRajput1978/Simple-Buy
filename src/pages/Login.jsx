@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Button, Col, Container, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Cookies from "js-cookie";
-import { useMutation } from "@tanstack/react-query";
-import axios from "../axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useMutation } from "@tanstack/react-query";
+import Cookies from "js-cookie";
+
+import axios from "../axios";
 import { setAuth } from "../redux/reducer/authSlice";
+import { toast } from "../utils/helper";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -23,11 +26,9 @@ const Login = () => {
         secure: true,
         sameSite: "Strict",
       });
-      console.log(user, "user hia na");
-      // Store in Redux
+
       dispatch(setAuth({ user }));
 
-      // Role-based redirect
       if (user.role === "admin" || user.role === "superAdmin") {
         navigate("/dashboard");
       } else {
@@ -35,7 +36,7 @@ const Login = () => {
       }
     },
     onError: (err) => {
-      alert(err.response.data.message);
+      toast(err.response.data.message);
     },
   });
 
@@ -45,11 +46,11 @@ const Login = () => {
   };
 
   return (
-    <div className="container my-3 py-3">
+    <Container className="my-3 py-3">
       <h1 className="text-center">Login</h1>
       <hr />
-      <div className="row my-4 h-100">
-        <div className="col-md-4 col-lg-4 col-sm-8 mx-auto">
+      <Row className="my-4 h-100">
+        <Col md={4} sm={8} className="mx-auto">
           <form onSubmit={handleSubmit}>
             <div className="my-3">
               <label htmlFor="email">Email address</label>
@@ -90,18 +91,19 @@ const Login = () => {
               </p>
             </div>
             <div className="text-center">
-              <button
-                className="my-2 mx-auto btn btn-dark"
+              <Button
+                variant="dark"
+                className="my-2 mx-auto "
                 type="submit"
                 disabled={loginHandler.isLoading}
               >
                 {loginHandler.isLoading ? "Logging in..." : "Login"}
-              </button>
+              </Button>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

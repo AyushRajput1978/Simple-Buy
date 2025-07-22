@@ -11,7 +11,7 @@ import {
   Badge,
   Row,
 } from "react-bootstrap";
-import { useReducer, useState } from "react";
+import { useState } from "react";
 import {
   FaCheckCircle,
   FaTruck,
@@ -22,37 +22,12 @@ import { TableLoadingShimmer } from "../layout/LoadingShimmers";
 import { toast } from "../../utils/helper";
 
 const OrdersTable = () => {
-  //   const [showModal, setShowModal] = useState(false);
-  //   const [initialData, setInitialData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Functions
   const fetchAllOrders = async () => {
     const res = await axios.get("/dashboard/orders");
     return res.data.data;
   };
-  const handleEdit = async (id, status) => {
-    const res = await axios.patch(`/dashboard/orders/${id}`, {
-      status,
-    });
-    refetchOrders();
-    setShowModal(true);
-  };
-  const handleDelete = async (id) => {
-    setLoading(true);
-    try {
-      await axios.delete(`/dashboard/orders/${id}`);
-      //  Show success toast
-      toast("Order deleted successfully");
-      refetchOrders();
-    } catch (err) {
-      toast(err.response.data.message || "Something went wrong", false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // tanstack-react-query
   const {
     data,
     isLoading,
@@ -62,8 +37,30 @@ const OrdersTable = () => {
     queryFn: fetchAllOrders,
   });
 
+  const handleEdit = async (id, status) => {
+    const res = await axios.patch(`/dashboard/orders/${id}`, {
+      status,
+    });
+    toast(`Order status marked ${status} successfully`);
+    refetchOrders();
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`/dashboard/orders/${id}`);
+      toast("Order deleted successfully");
+      refetchOrders();
+    } catch (err) {
+      toast(err.response.data.message || "Something went wrong", false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (isLoading || loading) {
-    return <TableLoadingShimmer heading="Product" />;
+    return <TableLoadingShimmer />;
   }
   const statuses = [
     {

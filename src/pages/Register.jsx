@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import Cookies from "js-cookie";
-import axios from "../axios";
 import { useDispatch } from "react-redux";
+
+import axios from "../axios";
 import { setAuth } from "../redux/reducer/authSlice";
+import { Button, Col, Container, Row } from "react-bootstrap";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -74,15 +76,15 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" })); // Clear error as user types
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   return (
-    <div className="container my-3 py-3">
+    <Container className="my-3 py-3">
       <h1 className="text-center">Register</h1>
       <hr />
-      <div className="row my-4 h-100">
-        <div className="col-md-6 col-lg-4 col-sm-8 mx-auto">
+      <Row className="my-4 h-100">
+        <Col lg={4} md={6} sm={8} className="mx-auto">
           <form onSubmit={handleSubmit}>
             {[
               { label: "Full Name", name: "name", type: "text" },
@@ -125,18 +127,19 @@ const Register = () => {
             </div>
 
             <div className="text-center">
-              <button
-                className="my-2 mx-auto btn btn-dark"
+              <Button
+                variant="dark"
+                className="my-2 mx-auto"
                 type="submit"
                 disabled={loginHandler.isLoading}
               >
                 {loginHandler.isLoading ? "Registering..." : "Register"}
-              </button>
+              </Button>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

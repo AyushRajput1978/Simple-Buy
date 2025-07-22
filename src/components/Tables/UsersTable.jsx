@@ -1,36 +1,19 @@
-import axios from "../../axios";
+import { useState } from "react";
+import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
 import { MdDelete } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
-import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
-import { useState } from "react";
 import { TableLoadingShimmer } from "../layout/LoadingShimmers";
 import { toast } from "../../utils/helper";
+import axios from "../../axios";
 
 const UsersTable = () => {
   const [loading, setLoading] = useState(false);
 
-  // Functions
   const fetchUsers = async () => {
     const res = await axios.get("/dashboard/users");
     return res.data.data;
   };
-
-  const handleDelete = async (id) => {
-    setLoading(true);
-    try {
-      await axios.delete(`/dashboard/users/${id}`);
-      //  Show success toast
-      toast("User deleted successfully");
-      refetchProducts();
-    } catch (err) {
-      toast(err.response.data.message || "Something went wrong", false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // tanstack-react-query
   const {
     data,
     isLoading,
@@ -39,6 +22,19 @@ const UsersTable = () => {
     queryKey: ["users"],
     queryFn: fetchUsers,
   });
+
+  const handleDelete = async (id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`/dashboard/users/${id}`);
+      toast("User deleted successfully");
+      refetchProducts();
+    } catch (err) {
+      toast(err.response.data.message || "Something went wrong", false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (isLoading || loading) {
     return <TableLoadingShimmer />;

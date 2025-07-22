@@ -34,30 +34,19 @@ const AddressCard = ({ address, setAddresses, onEdit }) => {
         </div>
       </Card.Header>
       <Card.Body>
-        <Row className="mb-1">
-          <Col xs={4}>
-            <strong>City:</strong>
-          </Col>
-          <Col xs={8}>{address.city}</Col>
-        </Row>
-        <Row className="mb-1">
-          <Col xs={4}>
-            <strong>State:</strong>
-          </Col>
-          <Col xs={8}>{address.state}</Col>
-        </Row>
-        <Row className="mb-1">
-          <Col xs={4}>
-            <strong>Country:</strong>
-          </Col>
-          <Col xs={8}>{address.country}</Col>
-        </Row>
-        <Row>
-          <Col xs={4}>
-            <strong>Postal Code:</strong>
-          </Col>
-          <Col xs={8}>{address.postalCode}</Col>
-        </Row>
+        {[
+          { label: "City", name: "city" },
+          { label: "State", name: "state" },
+          { label: "Country", name: "country" },
+          { label: "Postal Code", name: "postalCode" },
+        ].map(({ label, name }) => (
+          <Row className="mb-1">
+            <Col xs={4}>
+              <strong>{label}</strong>
+            </Col>
+            <Col xs={8}>{address[name]}</Col>
+          </Row>
+        ))}
       </Card.Body>
     </Card>
   );

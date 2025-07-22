@@ -1,12 +1,12 @@
-// pages/dashboard/DashboardHome.js
-
 import { FaUsers } from "react-icons/fa6";
 import { LuPackageOpen } from "react-icons/lu";
 import { FaRupeeSign, FaShoppingCart } from "react-icons/fa";
 import { BiSolidCategoryAlt } from "react-icons/bi";
-import axios from "../../axios";
 import { useQuery } from "@tanstack/react-query";
 import Skeleton from "react-loading-skeleton";
+import { Card, Col, Row } from "react-bootstrap";
+
+import axios from "../../axios";
 
 const DashboardHome = () => {
   const fetchAllStats = async () => {
@@ -18,9 +18,9 @@ const DashboardHome = () => {
     queryFn: fetchAllStats,
   });
 
-  const StatCard = ({ title, icon, iconColor, bgColor, value }) => (
-    <div className="col" key={title}>
-      <div className="card p-3 shadow-sm border-0 rounded-4">
+  const StatCard = ({ title, icon, bgColor, value }) => (
+    <Col lg={3} md={4} sm={6} key={title}>
+      <Card className="p-3 shadow-sm border-0 rounded-4">
         <div className="d-flex justify-content-between align-items-center">
           <h2 className="text-muted mb-0 text-uppercase fs-6">{title}</h2>
           <div
@@ -38,8 +38,8 @@ const DashboardHome = () => {
         <h3 className="fw-bold mt-3 fs-3">
           {isLoading ? <Skeleton width={60} /> : value}
         </h3>
-      </div>
-    </div>
+      </Card>
+    </Col>
   );
 
   const statsConfig = [
@@ -79,7 +79,7 @@ const DashboardHome = () => {
   return (
     <div>
       <h1>Welcome to the Dashboard</h1>
-      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
+      <Row className="g-4 mt-4">
         {statsConfig.map((item) => (
           <StatCard
             key={item.title}
@@ -91,7 +91,7 @@ const DashboardHome = () => {
             }
           />
         ))}
-      </div>
+      </Row>
     </div>
   );
 };

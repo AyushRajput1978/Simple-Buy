@@ -1,9 +1,10 @@
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import axios from "../axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useCart from "../hooks/useCart";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+
+import useCart from "../hooks/useCart";
+import axios from "../axios";
 
 const CARD_ELEMENT_OPTIONS = {
   style: {
@@ -59,25 +60,25 @@ const Payment = () => {
 
       setClientSecret(data.clientSecret);
 
-      const result = await stripe.confirmCardPayment(data.clientSecret, {
+      const paymentResult = await stripe.confirmCardPayment(data.clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
           billing_details: {
-            name, // required
+            name,
             address: {
               line1: "123 Street",
               city: "Mumbai",
               postal_code: "400001",
-              country: "IN", // ISO 2-letter country code
+              country: "IN",
             },
           },
         },
       });
 
-      if (result.error) {
-        setError(result.error.message);
+      if (paymentResult.error) {
+        setError(paymentResult.error.message);
         setProcessing(false);
-      } else if (result.paymentIntent.status === "succeeded") {
+      } else if (paymentResult.paymentIntent.status === "succeeded") {
         toast("Payment Successful");
         fetchCart();
         setTimeout(() => navigate("/"), 3000);

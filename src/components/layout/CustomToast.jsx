@@ -1,7 +1,7 @@
-// components/layout/CustomToast.jsx
 import { Toast, Col } from "react-bootstrap";
 import { FaBan, FaCheckCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+
 import { hideToast } from "../../redux/reducer/toastSlice";
 
 const CustomToast = () => {

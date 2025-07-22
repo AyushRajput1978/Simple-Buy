@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { Modal, Button, Form } from "react-bootstrap";
-import axios from "../../axios"; // your axios instance
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Modal, Button, Form } from "react-bootstrap";
+import PropTypes from "prop-types";
+
+import axios from "../../axios";
+
+const initialFormState = { name: "" };
 
 const AddEditProductCategoriesModal = ({
   show,
@@ -11,20 +14,15 @@ const AddEditProductCategoriesModal = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const [formData, setFormData] = useState({
-    name: "",
-  });
+  const [formData, setFormData] = useState(initialFormState);
 
-  // Pre-fill form when editing
   useEffect(() => {
     if (initialData) {
-      setFormData({
-        name: initialData.name || "",
-      });
+      setFormData(initialData);
     } else {
-      setFormData({ name: "" });
+      setFormData(initialFormState);
     }
-  }, [initialData, show]);
+  }, [initialData]);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -42,19 +40,9 @@ const AddEditProductCategoriesModal = ({
       onClose();
     },
     onError: (error) => {
-      console.error("Failed to submit:", error);
+      toast(`Failed to submit:${error}`, false);
     },
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      //   [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     mutation.mutate(formData);
@@ -76,7 +64,7 @@ const AddEditProductCategoriesModal = ({
               placeholder="Enter category name"
               autoFocus
               value={formData.name}
-              onChange={handleChange}
+              onChange={(e) => handleChange(e, setFormData)}
               required
             />
           </Form.Group>
@@ -108,7 +96,7 @@ const AddEditProductCategoriesModal = ({
 AddEditProductCategoriesModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  initialData: PropTypes.object, // optional
+  initialData: PropTypes.object,
 };
 
 export default AddEditProductCategoriesModal;

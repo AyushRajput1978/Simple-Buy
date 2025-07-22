@@ -1,37 +1,54 @@
-import axios from "../../axios";
+import { Table, Spinner, Dropdown, Card, ButtonGroup } from "react-bootstrap";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
-import { Table, Spinner, Dropdown, Card, ButtonGroup } from "react-bootstrap";
-import { useState } from "react";
+
+import axios from "../../axios";
 import AddEditProductCategoriesModal from "../AddEditModals/AddEditProductCategoriesModal";
+import { TableLoadingShimmer } from "../layout/LoadingShimmers";
 
 const ProductCategoriesTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [initialData, setInitialData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const fetchProductCategories = async () => {
     const res = await axios.get("/dashboard/product-categories");
     return res.data.data;
   };
-
-  const { data, isLoading } = useQuery({
+  const {
+    data,
+    isLoading,
+    refetch: refetchProductCategories,
+  } = useQuery({
     queryKey: ["product-categories"],
     queryFn: fetchProductCategories,
   });
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-5">
-        <Spinner animation="border" variant="primary" />
-      </div>
-    );
-  }
   const handleEdit = async (id) => {
     const res = await axios.get(`/dashboard/product-categories/${id}`);
     setInitialData(res.data.data);
     setShowModal(true);
   };
+
+  const handleDelete = async (id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`/dashboard/product-categories/${id}`);
+      toast("Product category deleted successfully");
+      refetchProductCategories();
+    } catch (err) {
+      toast(err.response.data.message || "Something went wrong", false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isLoading || loading) {
+    return <TableLoadingShimmer />;
+  }
   return (
     <Card border="light" className="table-wrapper table-responsive shadow-sm">
       <Card.Body className="p-0 pb-4 justify-content-center">
@@ -76,7 +93,7 @@ const ProductCategoriesTable = () => {
                         </Dropdown.Item>
                         <Dropdown.Item
                           className="text-danger d-flex align-items-center gap-1"
-                          onClick={() => {}}
+                          onClick={() => handleDelete(cat._id)}
                         >
                           <MdDelete />
                           <span>Remove</span>

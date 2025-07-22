@@ -1,4 +1,3 @@
-// components/DashboardLayout.js
 import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import {
@@ -10,12 +9,13 @@ import {
   FaChevronCircleLeft,
   FaChevronCircleRight,
 } from "react-icons/fa";
-import "./index.css"; // Optional for custom styling
+import "./index.css";
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
+
   // Collapse on small screens initially
   useEffect(() => {
     if (window.innerWidth < 600) {
@@ -47,7 +47,7 @@ const DashboardLayout = () => {
             <FaChevronCircleLeft className="fs-4" />
           )}
         </button>
-        {/* <div className="d-flex justify-content-between align-items-center"> */}
+
         <NavLink className="navbar-brand fw-bold fs-4" to="/">
           <img
             className="card-img img-fluid"
@@ -59,7 +59,7 @@ const DashboardLayout = () => {
             }}
           />
         </NavLink>
-        {/* </div> */}
+
         <nav className="mt-4 nav flex-column">
           <NavLink to="/dashboard" end className="nav-link text-white my-1">
             <FaTachometerAlt className="me-2" />

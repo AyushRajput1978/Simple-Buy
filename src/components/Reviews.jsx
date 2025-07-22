@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-import RatingStars from "../utils/RatingStars";
 import {
   Button,
   Card,
@@ -10,9 +8,12 @@ import {
   Stack,
 } from "react-bootstrap";
 import { Fragment, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { format } from "date-fns";
+
 import AddEditReview from "./AddEditModals/AddEditReview";
 import axios from "../axios";
-import { useSelector } from "react-redux";
+import RatingStars from "../utils/RatingStars";
 import ConfirmModal from "./layout/AlertModal";
 import { toast } from "../utils/helper";
 
@@ -25,22 +26,37 @@ const Reviews = ({
 }) => {
   const [openReviewModal, setOpenReviewModal] = useState(false);
   const [editData, setEditData] = useState(null);
-  const [restrictAddReview, setRestrictAddReview] = useState(false);
   const [restrictAddReviewMsg, setRestrictAddReviewMsg] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [reviewId, setReviewId] = useState(null);
 
   const userData = useSelector((state) => state.auth.user);
 
+  useEffect(() => {
+    if (!userData) {
+      setRestrictAddReviewMsg("Please login or signup to add a review");
+    }
+  }, [userData]);
+  useEffect(() => {
+    if (userData) {
+      reviews.forEach((review) => {
+        if (review.user.id === userData.id) {
+          setRestrictAddReviewMsg(
+            "You are allowed to add one review per product"
+          );
+        }
+      });
+    }
+  }, [reviews]);
+
   const handleAddReview = () => {
-    if (restrictAddReview) {
+    if (restrictAddReviewMsg) {
       toast(restrictAddReviewMsg, false);
       return;
     }
     setEditData(null);
     setOpenReviewModal(true);
   };
-
   const handleEditReview = (review) => {
     setEditData({
       product: review.product,
@@ -51,7 +67,6 @@ const Reviews = ({
     });
     setOpenReviewModal(true);
   };
-
   const deleteReview = async (id) => {
     try {
       await axios.delete(`/reviews/${id}`);
@@ -67,33 +82,16 @@ const Reviews = ({
     setShowConfirmModal(false);
     setReviewId(null);
   };
-  useEffect(() => {
-    if (!userData) {
-      setRestrictAddReview(true);
-      setRestrictAddReviewMsg("Please login or signup to add a review");
-    }
-  }, [userData]);
-  useEffect(() => {
-    if (userData) {
-      reviews.forEach((review) => {
-        if (review.user.id === userData.id) {
-          setRestrictAddReview(true);
-          setRestrictAddReviewMsg(
-            "You are allowed to add one review per product"
-          );
-        }
-      });
-    }
-  }, [reviews]);
+
   return (
     <Container className="my-5 reviews-container">
       <div className="text-center mb-5">
-        <h2 className="fw-bold text-primary">
+        <h3 className="fw-bold text-primary">
           Reviews <span className="fs-5 text-muted">({reviewsCount})</span>
-        </h2>
+        </h3>
         {Boolean(reviewsCount) && (
           <Fragment>
-            <h5 className="text-secondary mb-2">What Customers Think</h5>
+            <h4 className="text-secondary mb-2">What Customers Think</h4>
             <div className="d-flex justify-content-center align-items-center">
               <RatingStars ratings={ratingsAverage} reviews={true} />
               <span className="ms-2 fw-semibold text-cta">

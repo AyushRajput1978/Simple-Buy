@@ -1,12 +1,12 @@
-import axios from "../../axios";
+import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
-import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
-import { useReducer, useState } from "react";
 import AddEditProductModal from "../AddEditModals/AddEditProductModal";
 import { TableLoadingShimmer } from "../layout/LoadingShimmers";
+import axios from "../../axios";
 import { toast } from "../../utils/helper";
 
 const ProductsTable = () => {
@@ -14,31 +14,10 @@ const ProductsTable = () => {
   const [initialData, setInitialData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Functions
   const fetchProducts = async () => {
     const res = await axios.get("/dashboard/products");
     return res.data.data;
   };
-  const handleEdit = async (id) => {
-    const res = await axios.get(`/dashboard/products/${id}`);
-    setInitialData(res.data.data);
-    setShowModal(true);
-  };
-  const handleDelete = async (id) => {
-    setLoading(true);
-    try {
-      const res = await axios.delete(`/dashboard/products/${id}`);
-      //  Show success toast
-      toast("Product deleted successfully");
-      refetchProducts();
-    } catch (err) {
-      toast(err.response.data.message || "Something went wrong", false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // tanstack-react-query
   const {
     data,
     isLoading,
@@ -48,8 +27,27 @@ const ProductsTable = () => {
     queryFn: fetchProducts,
   });
 
+  const handleEdit = async (id) => {
+    const res = await axios.get(`/dashboard/products/${id}`);
+    setInitialData(res.data.data);
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id) => {
+    setLoading(true);
+    try {
+      const res = await axios.delete(`/dashboard/products/${id}`);
+      toast("Product deleted successfully");
+      refetchProducts();
+    } catch (err) {
+      toast(err.response.data.message || "Something went wrong", false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (isLoading || loading) {
-    return <TableLoadingShimmer heading="Product" />;
+    return <TableLoadingShimmer />;
   }
 
   return (
@@ -136,7 +134,6 @@ const ProductsTable = () => {
         )}
       </Card.Body>
 
-      {/* Add/Edit Modal */}
       <AddEditProductModal
         show={showModal}
         onClose={() => {

@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-
-import { Col, Row, Button, Card, Form } from "react-bootstrap";
-
-import { useDispatch, useSelector } from "react-redux";
+import { Col, Row, Button, Card, Form, Container } from "react-bootstrap";
+import { useSelector } from "react-redux";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import axios from "../axios";
-
 import ImageUploader from "../components/layout/ImageUploader";
 import AddressCard from "../components/layout/AddressCard";
 import AddEditAddress from "../components/AddEditModals/AddEditAddress";
@@ -31,7 +28,6 @@ const MyProfile = () => {
   });
   const userData = useSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
-  //useEffects
 
   useEffect(() => {
     setFormData({
@@ -44,7 +40,7 @@ const MyProfile = () => {
     setProfileImage(userData.photo);
   }, [userData]);
 
-  const { mutate, isPending } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: async (data) => {
       return await axios({
         method: "PATCH",
@@ -88,11 +84,9 @@ const MyProfile = () => {
     mutate(form);
   };
   return (
-    <>
+    <Container>
       <Card border="light" className="bg-white shadow-sm mb-4  ">
-        <h3 className="text-center m-2 green-color fontweigh-500">
-          My Profile
-        </h3>
+        <h1 className="text-center m-2 green-color display-6">My Profile</h1>
         <Card.Body>
           <Form className="mt-4" onSubmit={handleSubmit}>
             <Row className="justify-content-center mb-4">
@@ -171,7 +165,7 @@ const MyProfile = () => {
                       }))
                     }
                     onEdit={(address) => {
-                      setEditAddress(address); // populate modal
+                      setEditAddress(address);
                       setShowAddressModal(true);
                     }}
                   />
@@ -210,9 +204,9 @@ const MyProfile = () => {
             addresses: fn(prev.addresses),
           }))
         }
-        data={editAddress}
+        initialData={editAddress}
       />
-    </>
+    </Container>
   );
 };
 export default MyProfile;

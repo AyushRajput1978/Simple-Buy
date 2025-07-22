@@ -1,23 +1,23 @@
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
-import defaultAvatar from "/assets/default-avatar.jpg";
 import { CgProfile } from "react-icons/cg";
 import { FaCartShopping } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
-import { logout } from "../redux/reducer/authSlice";
 import Cookies from "js-cookie";
 import { MdSyncLock } from "react-icons/md";
 import { FaTachometerAlt } from "react-icons/fa";
+
+import defaultAvatar from "/assets/default-avatar.jpg";
+import { logout } from "../redux/reducer/authSlice";
 import useCart from "../hooks/useCart";
+import { Container, Nav } from "react-bootstrap";
 
 const Navbar = () => {
-  // Selectors
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cart } = useCart();
 
-  // Functions
   const logoutHandler = () => {
     dispatch(logout());
     Cookies.remove("JWT");
@@ -25,8 +25,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg custom-navbar navbar-dark py-3 sticky-top">
-      <div className="container">
+    <Nav className="navbar navbar-expand-lg custom-navbar navbar-dark py-3 sticky-top">
+      <Container>
         <button
           className="navbar-toggler mx-2"
           type="button"
@@ -48,7 +48,6 @@ const Navbar = () => {
         </NavLink>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav m-auto my-2 text-center">
-            {/* Navigation links */}
             <li className="nav-item">
               <NavLink className="nav-link" to="/">
                 Home
@@ -81,8 +80,6 @@ const Navbar = () => {
             </NavLink>
             {user ? (
               <>
-                {/* Cart */}
-
                 <div className="dropdown text-center">
                   <img
                     src={user.photo || defaultAvatar}
@@ -155,8 +152,8 @@ const Navbar = () => {
             )}
           </div>
         </div>
-      </div>
-    </nav>
+      </Container>
+    </Nav>
   );
 };
 

@@ -173,11 +173,11 @@ const Cart = () => {
   };
 
   return (
-    <div className="container my-3 py-3">
+    <Container className="my-3 py-3">
       <h1 className="text-center">Cart</h1>
       <hr />
       {cart.length > 0 ? <ShowCart /> : <EmptyCart />}
-    </div>
+    </Container>
   );
 };
 

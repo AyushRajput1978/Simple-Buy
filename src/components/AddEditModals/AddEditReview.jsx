@@ -1,12 +1,14 @@
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
-import axios from "../../axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import MultImageUploader from "../layout/MultiImageUploader";
 import { FaImages } from "react-icons/fa";
 import { BsChatQuote } from "react-icons/bs";
+
+import MultImageUploader from "../layout/MultiImageUploader";
 import StarRatingInput from "../layout/StarRatingsInput";
+import axios from "../../axios";
+import { toast } from "../../utils/helper";
 
 const AddEditReview = ({
   productId,
@@ -15,57 +17,60 @@ const AddEditReview = ({
   initialData = null,
   onUpdated,
 }) => {
-  const queryClient = useQueryClient();
-  const [galleryImages, setGalleryImages] = useState([]);
-
   const initialFormState = {
     product: productId,
     rating: null,
     comment: "",
   };
+  const queryClient = useQueryClient();
+
+  const [galleryImages, setGalleryImages] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
-  // Pre-fill form on edit
+
   useEffect(() => {
     if (initialData) {
       setFormData({ ...initialData });
       setGalleryImages([...initialData.images]);
     }
-  }, [initialData, show]);
+  }, [initialData]);
 
-  // Sync images to formData
   useEffect(() => {
     setFormData((prev) => ({ ...prev, images: [...galleryImages] }));
   }, [galleryImages]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (data) => {
-      if (initialData) {
-        return await axios.patch(`/reviews/${initialData.id}`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      } else {
-        return await axios.post("/reviews", data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      }
+      const url = initialData ? `/reviews/${initialData.id}` : "/reviews";
+      const method = initialData ? "PATCH" : "POST";
+
+      return await axios({
+        method,
+        url,
+        data,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["add-edit-reviews"]);
       onUpdated();
-      handleCloseAndClearState();
+      handleCloseAndReset();
     },
     onError: (error) => {
       console.error("Failed to submit:", error);
     },
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.rating || formData.rating < 1) {
+      toast("Please select a rating before submitting your review.", false);
+      return;
+    }
+
+    if (!formData.comment || formData.comment.trim().length === 0) {
+      toast("Please write a comment before submitting your review.", false);
+      return;
+    }
     const form = new FormData();
 
     for (const key in formData) {
@@ -81,7 +86,7 @@ const AddEditReview = ({
     mutate(form);
   };
 
-  const handleCloseAndClearState = () => {
+  const handleCloseAndReset = () => {
     onClose();
     setFormData(initialFormState);
     setGalleryImages([]);
@@ -90,7 +95,7 @@ const AddEditReview = ({
   return (
     <Modal
       show={show}
-      onHide={handleCloseAndClearState}
+      onHide={handleCloseAndReset}
       centered
       size="lg"
       className="review-modal"
@@ -140,7 +145,7 @@ const AddEditReview = ({
                   name="comment"
                   placeholder="Write your thoughts about this product..."
                   value={formData.comment}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e, setFormData)}
                   disabled={isPending}
                 />
               </Form.Group>
@@ -152,7 +157,7 @@ const AddEditReview = ({
           <Button
             variant="outline-secondary"
             disabled={isPending}
-            onClick={handleCloseAndClearState}
+            onClick={handleCloseAndReset}
           >
             Cancel
           </Button>

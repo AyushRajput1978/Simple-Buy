@@ -12,155 +12,139 @@ import {
   ModalTitle,
   Row,
 } from "react-bootstrap";
-
 import { useEffect, useState } from "react";
+
 import { handleChange } from "../../utils/helper";
 
-const AddEditAddress = ({ show, handleClose, data, setAddresses }) => {
-  const [form, setForm] = useState({
-    addressLine: "",
-    city: "",
-    state: "",
-    country: "",
-    postalCode: "",
-    isDefault: false,
-  });
+const initialFormState = {
+  addressLine: "",
+  city: "",
+  state: "",
+  country: "",
+  postalCode: "",
+  isDefault: false,
+};
+
+const AddEditAddress = ({ show, handleClose, initialData, setAddresses }) => {
+  const [form, setForm] = useState(initialFormState);
 
   useEffect(() => {
-    if (data) {
-      setForm({ ...data });
+    if (initialData) {
+      setForm(initialData);
+    } else {
+      setForm(initialFormState);
     }
-  }, [data]);
-  console.log(data, "data hia na", form);
-  const handleCloseAndClearState = () => {
-    handleClose();
-    setForm({
-      addressLine: "",
-      city: "",
-      state: "",
-      country: "",
-      postalCode: "",
-      isDefault: false,
-    });
+  }, [initialData]);
+
+  const resetForm = () => {
+    setForm(initialFormState);
   };
 
+  const handleCloseAndClear = () => {
+    handleClose();
+    resetForm();
+  };
+
+  const isValidForm = () => {
+    const { addressLine, city, state, country, postalCode } = form;
+    return addressLine && city && state && country && postalCode;
+  };
   const saveHandler = () => {
-    if (!form.addressLine || !form.state || !form.country || !form.postalCode) {
-      alert("All fields required");
+    if (!isValidForm()) {
+      alert("Please fill in all required fields.");
       return;
     }
 
     setAddresses((prev) => {
       let updated = [...prev];
-      // If editing
-      if (data && data.addressLine) {
+
+      if (form.isDefault) {
+        // Ensure only one default address
+        updated = updated.map((addr) => ({ ...addr, isDefault: false }));
+      }
+
+      if (initialData) {
+        // Editing mode
         updated = updated.map((addr) =>
-          addr.addressLine === data.addressLine ? form : addr
+          addr.postalCode === initialData.postalCode ? form : addr
         );
       } else {
-        // Ensure only one default
-        if (form.isDefault) {
-          updated = updated.map((addr) => ({ ...addr, isDefault: false }));
-        }
+        // Add new
         updated.push(form);
       }
-      console.log(updated, "updated");
+
       return updated;
     });
 
-    handleCloseAndClearState();
+    handleCloseAndClear();
   };
+
   return (
-    <Modal show={show} onHide={handleCloseAndClearState}>
+    <Modal show={show} onHide={handleCloseAndClear} centered>
       <ModalHeader closeButton>
-        <ModalTitle className="fontweigh-500">
-          Address<span className="text-danger">*</span>
+        <ModalTitle className="fw-semibold">
+          {initialData ? "Edit Address" : "Add Address"}
         </ModalTitle>
       </ModalHeader>
       <ModalBody>
         <Row>
-          <Col md={12} className="mb-2">
-            <FormGroup id="address_line2">
-              <FormLabel className="fontweigh-500">
-                House Number & Street
-              </FormLabel>
-              <FormControl
-                required
-                type="text"
-                name="addressLine"
-                value={form.addressLine}
-                onChange={(e) => handleChange(e, setForm)}
-                placeholder="Street"
-              />
-            </FormGroup>
-          </Col>
-          <Col md={12} className="mb-2">
-            <FormGroup id="city">
-              <FormLabel className="fontweigh-500">
-                City<span className="text-danger">*</span>
-              </FormLabel>
+          {[
+            {
+              name: "addressLine",
+              label: "House Number & Street",
+              placeholder: "Street",
+              required: true,
+            },
+            {
+              name: "city",
+              label: "City",
+              placeholder: "City",
+              required: true,
+            },
+            {
+              name: "state",
+              label: "State",
+              placeholder: "State",
+              required: true,
+            },
+            {
+              name: "country",
+              label: "Country",
+              placeholder: "Country",
+              required: true,
+            },
+            {
+              name: "postalCode",
+              label: "Postal Code",
+              placeholder: "Postal Code",
+              required: true,
+              type: "number",
+            },
+          ].map(({ name, label, placeholder, required, type = "text" }) => (
+            <Col md={12} className="mb-2" key={name}>
+              <FormGroup>
+                <FormLabel className="fw-semibold">
+                  {label}
+                  {required && <span className="text-danger">*</span>}
+                </FormLabel>
+                <FormControl
+                  required={required}
+                  type={type}
+                  name={name}
+                  value={form[name]}
+                  onChange={(e) => handleChange(e, setForm)}
+                  placeholder={placeholder}
+                />
+              </FormGroup>
+            </Col>
+          ))}
 
-              <FormControl
-                required
-                type="text"
-                name="city"
-                value={form.city}
-                onChange={(e) => handleChange(e, setForm)}
-                placeholder="City"
-              />
-            </FormGroup>
-          </Col>
-          <Col md={12} className="mb-2">
-            <FormGroup id="State">
-              <FormLabel className="fontweigh-500">
-                State<span className="text-danger">*</span>
-              </FormLabel>
-              <FormControl
-                required
-                type="text"
-                name="state"
-                value={form.state}
-                onChange={(e) => handleChange(e, setForm)}
-                placeholder="State"
-              />
-            </FormGroup>
-          </Col>
-          <Col md={12} className="mb-2">
-            <FormGroup id="country">
-              <FormLabel className="fontweigh-500">
-                Country<span className="text-danger">*</span>
-              </FormLabel>
-              <FormControl
-                required
-                type="text"
-                name="country"
-                value={form.country}
-                onChange={(e) => handleChange(e, setForm)}
-                placeholder="Country"
-              />
-            </FormGroup>
-          </Col>
-          <Col md={12}>
-            <FormGroup id="postcode">
-              <FormLabel className="fontweigh-500">
-                Postal Code<span className="text-danger">*</span>
-              </FormLabel>
-              <FormControl
-                type="number"
-                name="postalCode"
-                value={form.postalCode}
-                onChange={(e) => handleChange(e, setForm)}
-                placeholder="Postal Code"
-              />
-            </FormGroup>
-          </Col>
-
-          <Col md={12} className="mt-4">
+          <Col md={12} className="mt-3">
             <FormCheck
-              label="Default"
+              label="Default Address"
               checked={form.isDefault}
               onChange={(e) =>
-                setForm({ ...form, isDefault: e.target.checked })
+                setForm((prev) => ({ ...prev, isDefault: e.target.checked }))
               }
             />
           </Col>
