@@ -20,33 +20,67 @@ import {
 } from "react-icons/fa";
 import { TableLoadingShimmer } from "../layout/LoadingShimmers";
 import { toast } from "../../utils/helper";
+import ConfirmModal from "../layout/AlertModal";
+
+const statusOptions = [
+  {
+    name: "Confirmed",
+    icon: <FaCheckCircle className="text-primary" />,
+    value: "confirmed",
+    color: "primary",
+  },
+  {
+    name: "Dispatched",
+    icon: <FaTruck className="text-warning" />,
+    value: "dispatched",
+    color: "warning",
+  },
+  {
+    name: "Out for delivery",
+    icon: <FaBoxOpen className="text-info" />,
+    value: "out for delivery",
+    color: "info",
+  },
+  {
+    name: "Delivered",
+    icon: <FaRegCheckSquare className="text-success" />,
+    value: "delivered",
+    color: "success",
+  },
+];
+
+const getStatusColor = (status) =>
+  statusOptions.find((s) => s.value === status)?.color || "secondary";
 
 const OrdersTable = () => {
   const [loading, setLoading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [orderId, setOrderId] = useState(null);
 
-  const fetchAllOrders = async () => {
+  const fetchOrders = async () => {
     const res = await axios.get("/dashboard/orders");
     return res.data.data;
   };
   const {
-    data,
+    data: orders,
     isLoading,
     refetch: refetchOrders,
   } = useQuery({
     queryKey: ["Orders"],
-    queryFn: fetchAllOrders,
+    queryFn: fetchOrders,
   });
 
-  const handleEdit = async (id, status) => {
-    const res = await axios.patch(`/dashboard/orders/${id}`, {
-      status,
-    });
-    toast(`Order status marked ${status} successfully`);
-    refetchOrders();
-    setShowModal(true);
+  const handleStatusUpdate = async (id, status) => {
+    try {
+      await axios.patch(`/dashboard/orders/${id}`, { status });
+      toast(`Order status marked as "${status}" successfully`);
+      refetch();
+    } catch (err) {
+      toast("Failed to update status", false);
+    }
   };
 
-  const handleDelete = async (id) => {
+  const deleteOrder = async (id) => {
     setLoading(true);
     try {
       await axios.delete(`/dashboard/orders/${id}`);
@@ -58,91 +92,81 @@ const OrdersTable = () => {
       setLoading(false);
     }
   };
-
+  const handleConfirmDeleteOrder = () => {
+    deleteOrder(orderId);
+    setShowConfirmModal(false);
+    setOrderId(null);
+  };
   if (isLoading || loading) {
     return <TableLoadingShimmer />;
   }
-  const statuses = [
-    {
-      name: "Confirmed",
-      icon: <FaCheckCircle className="text-primary" />,
-      value: "confirmed",
-    },
-    {
-      name: "Dispatched",
-      icon: <FaTruck className="text-warning" />,
-      value: "dispatched",
-    },
-    {
-      name: "Out for delivery",
-      icon: <FaBoxOpen className="text-info" />,
-      value: "out for delivery",
-    },
-    {
-      name: "Delivered",
-      icon: <FaRegCheckSquare className="text-success" />,
-      value: "delivered",
-    },
-  ];
+
+  const renderStatusBadge = (status) => (
+    <Badge className="fw-normal" bg={getStatusColor(status)}>
+      {status.toUpperCase()}
+    </Badge>
+  );
+
+  const renderDropdownItems = (order) => (
+    <>
+      {statusOptions
+        .filter((s) => s.value !== order.status)
+        .map((s) => (
+          <Dropdown.Item
+            key={s.value}
+            onClick={() => handleStatusUpdate(order._id, s.value)}
+            className="d-flex align-items-center gap-1"
+          >
+            {s.icon} <span>{s.name}</span>
+          </Dropdown.Item>
+        ))}
+      <Dropdown.Item
+        className="text-danger d-flex align-items-center gap-1"
+        onClick={() => {
+          setShowConfirmModal(true);
+          setOrderId(order._id);
+        }}
+      >
+        <MdDelete />
+        <span>Remove</span>
+      </Dropdown.Item>
+    </>
+  );
   return (
     <Card border="light" className="shadow-sm vh-100">
       <Card.Body className="p-0 pb-4 justify-content-center">
-        {data.length > 0 ? (
-          <div className="table-responsive  h-50">
+        {orders.length > 0 ? (
+          <div className="table-responsive h-50">
             <Table hover className="user-table" style={{ minWidth: "800px" }}>
               <thead>
                 <tr>
-                  <th className="border-bottom">SNo.</th>
-                  <th className="border-bottom">Products</th>
-                  <th className="border-bottom">Total Amount</th>
-                  <th className="border-bottom">Status</th>
-                  <th className="border-bottom">User</th>
-                  <th className="border-bottom">Shipping Address</th>
-                  <th className="border-bottom">Action</th>
+                  <th>SNo.</th>
+                  <th>Products</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>User</th>
+                  <th>Shipping Address</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {data.map((order, index) => (
+                {orders.map((order, index) => (
                   <tr key={order._id}>
-                    <td text-label="SNo.">
-                      <span className="fw-normal">{index + 1}</span>
-                    </td>
-
-                    <td text-label="Products">
+                    <td>{index + 1}</td>
+                    <td>
                       {order.orderItems.map((item) => (
-                        <div className="fw-normal">
-                          {item.product.name} x {item.quantity}={item.price}
+                        <div key={item._id}>
+                          {item?.product?.name} × {item.quantity} = {item.price}
                         </div>
                       ))}
                     </td>
-                    <td text-label="Total Amount">
-                      <span className="fw-normal">{order.totalAmount}</span>
-                    </td>
-                    <td text-label="Status">
-                      <Badge
-                        className="fw-normal"
-                        bg={`${
-                          order.status === "dispatched"
-                            ? "warning"
-                            : order.status === "out for delivery"
-                            ? "info"
-                            : order.status === "delivered"
-                            ? "success"
-                            : "primary"
-                        }`}
-                      >
-                        {order.status.toUpperCase()}
-                      </Badge>
-                    </td>
-                    <td text-label="User">
-                      <span className="fw-normal">{order.user.name}</span>
-                    </td>
-                    <td text-label="Shipping Address">
-                      <span className="fw-normal">
-                        {order.shippingAddress.address},
-                        {order.shippingAddress.city},
-                        {order.shippingAddress.postalCode}
-                      </span>
+                    <td>{order.totalAmount}</td>
+                    <td>{renderStatusBadge(order.status)}</td>
+                    <td>{order.user?.name || "Guest"}</td>
+                    <td>
+                      {order.shippingAddress?.address},{" "}
+                      {order.shippingAddress?.city},{" "}
+                      {order.shippingAddress?.postalCode}
                     </td>
                     <td>
                       <Dropdown as={ButtonGroup} drop="down-centered">
@@ -155,26 +179,7 @@ const OrdersTable = () => {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                          {statuses
-                            .filter((sta) => sta.value !== order.status)
-                            .map((availableStatus) => (
-                              <Dropdown.Item
-                                onClick={() => {
-                                  handleEdit(order._id, availableStatus.value);
-                                }}
-                                className="d-flex align-items-center gap-1"
-                              >
-                                {availableStatus.icon}{" "}
-                                <span>{availableStatus.name}</span>
-                              </Dropdown.Item>
-                            ))}
-                          <Dropdown.Item
-                            className="text-danger d-flex align-items-center gap-1"
-                            onClick={() => handleDelete(order._id)}
-                          >
-                            <MdDelete />
-                            <span>Remove</span>
-                          </Dropdown.Item>
+                          {renderDropdownItems(order)}
                         </Dropdown.Menu>
                       </Dropdown>
                     </td>
@@ -184,11 +189,19 @@ const OrdersTable = () => {
             </Table>
           </div>
         ) : (
-          <Row className="justify-content-center align-item-center text-dark fontweigh-500 p-4">
-            No Data Available.....
+          <Row className="justify-content-center align-items-center text-dark fw-semibold p-4">
+            No Orders Found
           </Row>
         )}
       </Card.Body>
+      <ConfirmModal
+        showConfirmModal={showConfirmModal}
+        setShowConfirmModal={setShowConfirmModal}
+        handleConfirmClear={handleConfirmDeleteOrder}
+        heading="Confirm Delete Order"
+        bodyText="This action is permanent, Are you sure you want to permanently delete this order?"
+        confirmText="Yes, I m sure"
+      />
     </Card>
   );
 };

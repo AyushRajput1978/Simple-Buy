@@ -3,12 +3,16 @@ import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
 import { MdDelete } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
+
 import { TableLoadingShimmer } from "../layout/LoadingShimmers";
 import { toast } from "../../utils/helper";
 import axios from "../../axios";
+import ConfirmModal from "../layout/AlertModal";
 
 const UsersTable = () => {
   const [loading, setLoading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   const fetchUsers = async () => {
     const res = await axios.get("/dashboard/users");
@@ -23,7 +27,7 @@ const UsersTable = () => {
     queryFn: fetchUsers,
   });
 
-  const handleDelete = async (id) => {
+  const deleteUser = async (id) => {
     setLoading(true);
     try {
       await axios.delete(`/dashboard/users/${id}`);
@@ -35,7 +39,11 @@ const UsersTable = () => {
       setLoading(false);
     }
   };
-
+  const handleConfirmDeleteUser = () => {
+    deleteUser(userId);
+    setShowConfirmModal(false);
+    setUserId(null);
+  };
   if (isLoading || loading) {
     return <TableLoadingShimmer />;
   }
@@ -52,12 +60,12 @@ const UsersTable = () => {
             >
               <thead>
                 <tr>
-                  <th className="border-bottom">SNo.</th>
-                  <th className="border-bottom">Name</th>
-                  <th className="border-bottom">Role</th>
-                  <th className="border-bottom">Email</th>
-                  <th className="border-bottom">Phone Number</th>
-                  <th className="border-bottom">Action</th>
+                  <th>SNo.</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Email</th>
+                  <th>Phone Number</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -92,7 +100,10 @@ const UsersTable = () => {
                         <Dropdown.Menu>
                           <Dropdown.Item
                             className="text-danger d-flex align-items-center gap-1"
-                            onClick={() => handleDelete(user._id)}
+                            onClick={() => {
+                              setShowConfirmModal(true);
+                              setUserId(user._id);
+                            }}
                           >
                             <MdDelete />
                             <span>Remove</span>
@@ -111,6 +122,14 @@ const UsersTable = () => {
           </Row>
         )}
       </Card.Body>
+      <ConfirmModal
+        showConfirmModal={showConfirmModal}
+        setShowConfirmModal={setShowConfirmModal}
+        handleConfirmClear={handleConfirmDeleteUser}
+        heading="Confirm Delete User"
+        bodyText="This action is permanent, Are you sure you want to permanently delete this User?"
+        confirmText="Yes, I m sure"
+      />
     </Card>
   );
 };

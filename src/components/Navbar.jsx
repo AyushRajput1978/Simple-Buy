@@ -23,7 +23,12 @@ const Navbar = () => {
     Cookies.remove("JWT");
     navigate("/");
   };
-
+  const navLinks = [
+    { path: "/", label: "Home" },
+    { path: "/product", label: "Products" },
+    { path: "/about", label: "About" },
+    { path: "/contact", label: "Contact" },
+  ];
   return (
     <Nav className="navbar navbar-expand-lg custom-navbar navbar-dark py-3 sticky-top">
       <Container>
@@ -48,26 +53,13 @@ const Navbar = () => {
         </NavLink>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav m-auto my-2 text-center">
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/">
-                Home
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/product">
-                Products
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/about">
-                About
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/contact">
-                Contact
-              </NavLink>
-            </li>
+            {navLinks.map(({ label, path }) => (
+              <li className="nav-item">
+                <NavLink className="nav-link" to={path}>
+                  {label}
+                </NavLink>
+              </li>
+            ))}
           </ul>
 
           <div className="navbar-nav d-flex align-items-center justify-content-center gap-3 mt-3 mt-lg-0">

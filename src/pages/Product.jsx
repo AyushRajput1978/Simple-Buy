@@ -41,7 +41,6 @@ const Product = () => {
 
     return res?.data?.data?.similarProducts;
   };
-
   const { data: similarProducts, isLoading: simlarProductLoading } = useQuery({
     queryKey: ["similar-product", id],
     queryFn: fetchSimilarProducts,
@@ -100,11 +99,11 @@ const Product = () => {
   };
 
   return (
-    <div className="container my-5 py-4 px-4 rounded product-detail-section">
-      <div className="row">
+    <Container className="my-5 py-4 px-4 rounded product-detail-section">
+      <Row>
         {productLoading ? <DetailedProductLoadingShimmer /> : <ShowProduct />}
-      </div>
-      <div className="row my-5 py-5">
+      </Row>
+      <Row className="my-5 py-5">
         <div className="d-none d-md-block">
           <h2 className="">You may also Like</h2>
           <Marquee
@@ -120,7 +119,7 @@ const Product = () => {
             )}
           </Marquee>
         </div>
-      </div>
+      </Row>
       {!productLoading && (
         <Reviews
           productId={product?.id}
@@ -130,7 +129,7 @@ const Product = () => {
           refetchProductDetail={refetchProductDetail}
         />
       )}
-    </div>
+    </Container>
   );
 };
 

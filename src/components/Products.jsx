@@ -20,11 +20,10 @@ const Products = () => {
     const res = await axios("/product-categories");
     return res.data.data;
   };
-  const { data: productCategories } = useQuery({
+  const { data: productCategories = [] } = useQuery({
     queryKey: ["product-categories"],
     queryFn: fetchProductCategories,
   });
-
   const fetchProducts = async () => {
     const res = await axios("/products");
     return res.data.data;

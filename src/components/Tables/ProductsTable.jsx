@@ -8,11 +8,14 @@ import AddEditProductModal from "../AddEditModals/AddEditProductModal";
 import { TableLoadingShimmer } from "../layout/LoadingShimmers";
 import axios from "../../axios";
 import { toast } from "../../utils/helper";
+import ConfirmModal from "../layout/AlertModal";
 
 const ProductsTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [productId, setProductId] = useState(null);
 
   const fetchProducts = async () => {
     const res = await axios.get("/dashboard/products");
@@ -33,10 +36,10 @@ const ProductsTable = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
+  const deleteProduct = async (id) => {
     setLoading(true);
     try {
-      const res = await axios.delete(`/dashboard/products/${id}`);
+      await axios.delete(`/dashboard/products/${id}`);
       toast("Product deleted successfully");
       refetchProducts();
     } catch (err) {
@@ -49,7 +52,11 @@ const ProductsTable = () => {
   if (isLoading || loading) {
     return <TableLoadingShimmer />;
   }
-
+  const handleConfirmDeleteProduct = () => {
+    deleteProduct(orderId);
+    setShowConfirmModal(false);
+    setProductId(null);
+  };
   return (
     <Card border="light" className="shadow-sm">
       <Card.Body className="p-0 pb-4 justify-content-center">
@@ -62,12 +69,12 @@ const ProductsTable = () => {
             >
               <thead>
                 <tr>
-                  <th className="border-bottom">SNo.</th>
-                  <th className="border-bottom">Image</th>
-                  <th className="border-bottom">Name</th>
-                  <th className="border-bottom">Category</th>
-                  <th className="border-bottom">Price</th>
-                  <th className="border-bottom">Action</th>
+                  <th>SNo.</th>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -114,7 +121,10 @@ const ProductsTable = () => {
                           </Dropdown.Item>
                           <Dropdown.Item
                             className="text-danger d-flex align-items-center gap-1"
-                            onClick={() => handleDelete(prod.id)}
+                            onClick={() => {
+                              setShowConfirmModal(true);
+                              setProductId(prod.id);
+                            }}
                           >
                             <MdDelete />
                             <span>Remove</span>
@@ -141,6 +151,14 @@ const ProductsTable = () => {
           setEditId(null);
         }}
         initialData={initialData}
+      />
+      <ConfirmModal
+        showConfirmModal={showConfirmModal}
+        setShowConfirmModal={setShowConfirmModal}
+        handleConfirmClear={handleConfirmDeleteProduct}
+        heading="Confirm Delete Product"
+        bodyText="This action is permanent, Are you sure you want to permanently delete this product?"
+        confirmText="Yes, I m sure"
       />
     </Card>
   );

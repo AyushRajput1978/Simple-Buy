@@ -8,11 +8,14 @@ import { BsThreeDots } from "react-icons/bs";
 import axios from "../../axios";
 import AddEditProductCategoriesModal from "../AddEditModals/AddEditProductCategoriesModal";
 import { TableLoadingShimmer } from "../layout/LoadingShimmers";
+import ConfirmModal from "../layout/AlertModal";
 
 const ProductCategoriesTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [initialData, setInitialData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [prodCatId, setProdCatId] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const fetchProductCategories = async () => {
     const res = await axios.get("/dashboard/product-categories");
@@ -33,7 +36,7 @@ const ProductCategoriesTable = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
+  const deleteProdCat = async (id) => {
     setLoading(true);
     try {
       await axios.delete(`/dashboard/product-categories/${id}`);
@@ -44,6 +47,11 @@ const ProductCategoriesTable = () => {
     } finally {
       setLoading(false);
     }
+  };
+  const handleConfirmDeleteProdCat = () => {
+    deleteProdCat(prodCatId);
+    setShowConfirmModal(false);
+    setProdCatId(null);
   };
 
   if (isLoading || loading) {
@@ -56,10 +64,10 @@ const ProductCategoriesTable = () => {
           <Table hover className="user-table min-height">
             <thead>
               <tr>
-                <th className="border-bottom">SNo.</th>
-                <th className="border-bottom">Name</th>
+                <th>SNo.</th>
+                <th>Name</th>
 
-                <th className="border-bottom">Action</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -93,7 +101,10 @@ const ProductCategoriesTable = () => {
                         </Dropdown.Item>
                         <Dropdown.Item
                           className="text-danger d-flex align-items-center gap-1"
-                          onClick={() => handleDelete(cat._id)}
+                          onClick={() => {
+                            setShowConfirmModal(true);
+                            setOrderId(cat._id);
+                          }}
                         >
                           <MdDelete />
                           <span>Remove</span>
@@ -131,6 +142,14 @@ const ProductCategoriesTable = () => {
           setEditId(null);
         }}
         initialData={initialData}
+      />
+      <ConfirmModal
+        showConfirmModal={showConfirmModal}
+        setShowConfirmModal={setShowConfirmModal}
+        handleConfirmClear={handleConfirmDeleteProdCat}
+        heading="Confirm Delete Product Category"
+        bodyText="This action is permanent, Are you sure you want to permanently delete this Category?"
+        confirmText="Yes, I m sure"
       />
     </Card>
   );

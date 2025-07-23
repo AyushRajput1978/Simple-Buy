@@ -2,6 +2,7 @@ import { Badge, Button, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const ProductCard = ({ product, addProduct }) => {
+  console.log(product, "product");
   return (
     <Card className="shadow-sm w-100 h-100 product-card product-card-hover border-0">
       <Card.Img
@@ -12,6 +13,11 @@ const ProductCard = ({ product, addProduct }) => {
         className="p-3"
       />
       <Card.Body className="d-flex flex-column">
+        <div className="text-end">
+          <Badge bg="secondary" className="text-capitalize ms-2">
+            {product.category?.name || "General"}
+          </Badge>
+        </div>
         <div className="d-flex justify-content-between align-items-center mb-2">
           <OverlayTrigger
             placement="top"
@@ -23,9 +29,6 @@ const ProductCard = ({ product, addProduct }) => {
                 : product.name}
             </Card.Title>
           </OverlayTrigger>
-          <Badge bg="secondary" className="text-capitalize ms-2">
-            {product.category?.name || "General"}
-          </Badge>
         </div>
 
         <Card.Text className="text-muted mb-2" style={{ flex: 1 }}>
