@@ -79,3 +79,16 @@
   background-color: var(--color-cta);
   color: white;
 }
+
+.product-card .variant-hover {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transition: all 0.3s ease;
+}
+
+.product-card:hover .variant-hover {
+  max-height: 70px;
+  opacity: 1;
+}

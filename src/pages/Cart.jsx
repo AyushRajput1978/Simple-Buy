@@ -21,11 +21,10 @@ const Cart = () => {
   const { cart, deleteCart, updateCart } = useCart();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const userData = useSelector((state) => state.auth.user);
-
   const { subtotal, totalItems } = useMemo(() => {
     return cart.reduce(
       (acc, item) => {
-        acc.subtotal += item.product.price * item.quantity;
+        acc.subtotal += item.priceAtTime * item.quantity;
         acc.totalItems += item.quantity;
         return acc;
       },
@@ -33,8 +32,10 @@ const Cart = () => {
     );
   }, [cart]);
 
-  const handleAddItem = (product) => updateCart(product.id, "increment");
-  const handleRemoveItem = (product) => updateCart(product.id, "decrement");
+  const handleAddItem = (product, variantId) =>
+    updateCart(product.id, variantId, "increment");
+  const handleRemoveItem = (product, variantId) =>
+    updateCart(product.id, variantId, "decrement");
   const handleConfirmClear = () => {
     deleteCart();
     setShowConfirmModal(false);
@@ -114,22 +115,28 @@ const ShowCart = ({
                     />
                   </Col>
 
-                  <Col md={4} xs={8}>
+                  <Col md={6} xs={8}>
                     <h3 className="mb-1 fs-6">{item.product.name}</h3>
                     <small className="text-muted">
-                      ${item.product.price} × {item.quantity}
+                      Size: {item.attributeValue} {item.attributeName}
                     </small>
+                    <div className="fw-bol fs-5">
+                      ${item.priceAtTime || item.product.price} ×{" "}
+                      {item.quantity}
+                    </div>
                   </Col>
 
                   <Col
-                    md={6}
+                    md={4}
                     className="mt-2 mt-md-0 d-flex align-items-center justify-content-md-end"
                   >
                     <div className="d-flex align-items-center border rounded-3 overflow-hidden">
                       <Button
                         variant="light"
                         className="px-3 py-2 border-end"
-                        onClick={() => handleRemoveItem(item.product)}
+                        onClick={() =>
+                          handleRemoveItem(item.product, item.variantId)
+                        }
                       >
                         <i className="fas fa-minus" />
                       </Button>
@@ -137,7 +144,9 @@ const ShowCart = ({
                       <Button
                         variant="light"
                         className="px-3 py-2 border-start"
-                        onClick={() => handleAddItem(item.product)}
+                        onClick={() =>
+                          handleAddItem(item.product, item.variantId)
+                        }
                       >
                         <i className="fas fa-plus" />
                       </Button>

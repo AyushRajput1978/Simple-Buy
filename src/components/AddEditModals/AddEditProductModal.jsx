@@ -1,4 +1,14 @@
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Form,
+  Row,
+  Col,
+  OverlayTrigger,
+  FormLabel,
+  Tooltip,
+} from "react-bootstrap";
+import { FaInfoCircle, FaTrash } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import Select from "react-select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,6 +27,14 @@ const initialFormState = {
   countInStock: null,
   category: "",
   description: "",
+  variants: [
+    {
+      attributeName: "",
+      attributeValue: "",
+      regularPrice: 0,
+      countInStock: 0,
+    },
+  ],
 };
 const AddEditProductModal = ({ show, onClose, initialData = null }) => {
   const [image, setImage] = useState("");
@@ -78,6 +96,39 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
       console.error("Failed to submit:", error);
     },
   });
+  const handleAttributeChange = (index, key, newValue) => {
+    setFormData((prevForm) => {
+      const updatedVariants = [...prevForm.variants];
+      updatedVariants[index][key] = newValue;
+
+      return {
+        ...prevForm,
+        variants: updatedVariants,
+      };
+    });
+  };
+  const handleAddAttribute = () => {
+    setFormData((prevForm) => ({
+      ...prevForm,
+      variants: [
+        ...prevForm.variants,
+        {
+          attributeName: "",
+          attributeValue: "",
+          regularPrice: 0,
+          countInStock: 0,
+        },
+      ],
+    }));
+  };
+  const handleRemoveAttribute = (index) => {
+    setFormData((prevForm) => {
+      const updatedVariants = [...prevForm.variants];
+      updatedVariants.splice(index, 1);
+      return { ...prevForm, variants: updatedVariants };
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = new FormData();
@@ -85,6 +136,10 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
       const value = formData[key];
       if (key === "category" && value?.value) {
         form.append("productCategoryId", value.value);
+      } else if (key === "variants") {
+        formData.variants.forEach((varnt) => {
+          form.append("variants", JSON.stringify(varnt));
+        });
       } else {
         form.append(key, value);
       }
@@ -143,12 +198,6 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                 type: "text",
                 placeholder: "Roadster",
               },
-              {
-                name: "countInStock",
-                label: "Count In Stock",
-                type: "number",
-                placeholder: "Enter Count in Stock",
-              },
             ].map(({ name, label, type, placeholder }) => (
               <Col lg={3} md={4} key={name}>
                 <Form.Group className="mb-3">
@@ -195,6 +244,132 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
               </Form.Group>
             </Col>
           </Row>
+          {formData.variants?.map((varnt, index) => (
+            <Row key={index} className="mb-3">
+              <Col md={4} lg={3} xl={2}>
+                <Form.Group controlId={`attributeName${index}`}>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id="button-tooltip">
+                        Attribute parameter eg: cm, inch, cloth size: S, M, L
+                      </Tooltip>
+                    }
+                  >
+                    <FormLabel className="fontweigh-500">
+                      Attribute Name <FaInfoCircle />
+                    </FormLabel>
+                  </OverlayTrigger>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter attribute name (e.g: cm, inch, cloth size: S, M, L)"
+                    value={varnt.attributeName}
+                    onChange={(e) =>
+                      handleAttributeChange(
+                        index,
+                        "attributeName",
+                        e.target.value
+                      )
+                    }
+                  />
+                </Form.Group>
+                {/* {error[`variant_attribute_name_${index}`] && (
+                  <p className="text-danger">
+                    {error[`variant_attribute_name_${index}`]}
+                  </p>
+                )} */}
+              </Col>
+
+              <Col md={4} lg={3} xl={2}>
+                <Form.Group controlId={`attributeValue${index}`}>
+                  <Form.Label className="fontweigh-500">
+                    Attribute Value
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter attribute value"
+                    value={varnt.attributeValue}
+                    onChange={(e) =>
+                      handleAttributeChange(
+                        index,
+                        "attributeValue",
+                        e.target.value
+                      )
+                    }
+                  />
+                </Form.Group>
+                {/* {error[`variant_attribute_value_${index}`] && (
+                  <p className="text-danger">
+                    {error[`variant_attribute_value_${index}`]}
+                  </p>
+                )} */}
+              </Col>
+              <Col md={4} xl={2} lg={3}>
+                <Form.Group controlId={`regularPrice${index}`}>
+                  <Form.Label className="fontweigh-500">
+                    Regular Price
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="Enter Regular Price"
+                    value={varnt.regularPrice}
+                    onChange={(e) =>
+                      handleAttributeChange(
+                        index,
+                        "regularPrice",
+                        e.target.value
+                      )
+                    }
+                  />
+                </Form.Group>
+                {/* {error[`variant_regular_price_${index}`] && (
+                  <p className="text-danger">
+                    {error[`variant_regular_price_${index}`]}
+                  </p>
+                )} */}
+              </Col>
+
+              <Col md={4} lg={2}>
+                <Form.Group controlId={` countInStock${index}`}>
+                  <Form.Label className="fontweigh-500">Stock</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="Enter stock quantity"
+                    value={varnt.countInStock}
+                    onChange={(e) =>
+                      handleAttributeChange(
+                        index,
+                        "countInStock",
+                        e.target.value
+                      )
+                    }
+                  />
+                </Form.Group>
+                {/* {error[`variant_stock_quantity_${index}`] && (
+                  <p className="text-danger">
+                    {error[`variant_stock_quantity_${index}`]}
+                  </p>
+                )} */}
+              </Col>
+              <Col md={4} lg={3} className="d-flex  align-items-center mt-4">
+                {Boolean(formData.variants.length > 1) && (
+                  <FaTrash
+                    className="mr-4 text-danger"
+                    onClick={() => handleRemoveAttribute(index)}
+                    style={{ cursor: "pointer" }}
+                  />
+                )}
+                {index === formData.variants.length - 1 && (
+                  <Button
+                    variant="outline-primary"
+                    onClick={handleAddAttribute}
+                  >
+                    Add More
+                  </Button>
+                )}
+              </Col>
+            </Row>
+          ))}
         </Modal.Body>
 
         <Modal.Footer>

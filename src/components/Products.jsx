@@ -12,8 +12,8 @@ const Products = () => {
   const [filter, setFilter] = useState([]);
   const { addToCart } = useCart();
 
-  const addProduct = (product) => {
-    addToCart(product.id, 1);
+  const addProduct = (product, variantId) => {
+    addToCart(product.id, variantId, 1);
   };
 
   const fetchProductCategories = async () => {

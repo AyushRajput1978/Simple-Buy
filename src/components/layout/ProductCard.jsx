@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { Badge, Button, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const ProductCard = ({ product, addProduct }) => {
-  console.log(product, "product");
   return (
     <Card className="shadow-sm w-100 h-100 product-card product-card-hover border-0">
       <Card.Img
@@ -35,7 +35,21 @@ const ProductCard = ({ product, addProduct }) => {
           {product.description.substring(0, 90)}...
         </Card.Text>
 
-        <h5 className="fw-bold mb-3 text-dark">$ {product.price}</h5>
+        <strong className="fw-bold mb-1 text-dark">$ {product.price}</strong>
+        <div className="product-card">
+          {/* Product content like image/title/etc */}
+
+          {!!product.variants.length && (
+            <div className="variant-hover">
+              <div className="d-flex gap-2">
+                <small>Size:</small>
+                {product.variants.map((varnt, idx) => (
+                  <small key={idx}>{varnt.attributeValue}</small>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="mt-auto">
           <Button
@@ -55,7 +69,7 @@ const ProductCard = ({ product, addProduct }) => {
               color: "var(--color-primary)",
             }}
             variant="outline"
-            onClick={() => addProduct(product)}
+            onClick={() => addProduct(product, product.variants[0].id)}
           >
             Add to Cart
           </Button>

@@ -53,7 +53,7 @@ const ProductsTable = () => {
     return <TableLoadingShimmer />;
   }
   const handleConfirmDeleteProduct = () => {
-    deleteProduct(orderId);
+    deleteProduct(productId);
     setShowConfirmModal(false);
     setProductId(null);
   };

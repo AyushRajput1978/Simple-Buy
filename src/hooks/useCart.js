@@ -16,15 +16,14 @@ const useCart = () => {
     }
   };
 
-  const addToCart = async (productId, quantity) => {
+  const addToCart = async (productId, variantId, quantity) => {
     try {
       const res = await axios({
         method: "post",
         url: "/cart/add",
         data: {
           productId,
-          //   dis_id: Array.isArray(dis_id) ? dis_id : [dis_id],
-          //   variant_id: Array.isArray(variantId) ? variantId : [variantId],
+          variantId,
           quantity,
         },
       });
@@ -37,6 +36,7 @@ const useCart = () => {
   };
   const updateCart = async (
     productId,
+    variantId,
     action
     // variantId
   ) => {
@@ -46,6 +46,7 @@ const useCart = () => {
         url: "/cart/update",
         data: {
           productId,
+          variantId,
           action,
         },
       });

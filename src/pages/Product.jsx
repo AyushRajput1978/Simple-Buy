@@ -11,14 +11,21 @@ import {
   DetailedProductLoadingShimmer,
   SimilarProductsLoadingShimmer,
 } from "../components/layout/LoadingShimmers";
+import { useEffect, useState } from "react";
 
 const Product = () => {
   const { id } = useParams();
-
+  const [selectedVariant, setSelectedVariant] = useState({
+    attributenName: "",
+    attributeValue: "",
+    regularPrice: 0,
+    id: "",
+    countInStock: 0,
+  });
   const { addToCart } = useCart();
 
   const addProduct = (product) => {
-    addToCart(product.id, 1);
+    addToCart(product.id, selectedVariant.id, 1);
   };
 
   const fetchProduct = async ({ queryKey }) => {
@@ -45,6 +52,11 @@ const Product = () => {
     queryKey: ["similar-product", id],
     queryFn: fetchSimilarProducts,
   });
+  useEffect(() => {
+    if (product) {
+      setSelectedVariant(product?.variants[0]);
+    }
+  }, [product]);
 
   const ShowProduct = () => {
     return (
@@ -66,7 +78,23 @@ const Product = () => {
               </small>
               <h1 className="display-6">{product?.name}</h1>
               <RatingStars ratings={product?.ratingsAverage} />
-              <p className="fs-4 my-4">${product?.price}</p>
+              <p className="fs-4 my-3">₹{selectedVariant.regularPrice}</p>
+              <div className="d-flex gap-2 mb-2">
+                <span className="my-auto">Size:</span>
+                {product.variants.map((varnt) => (
+                  <Button
+                    variant="outline-primary"
+                    disabled={
+                      varnt.attributeValue === selectedVariant.attributeValue
+                    }
+                    onClick={() => {
+                      setSelectedVariant(varnt);
+                    }}
+                  >
+                    {varnt.attributeValue}
+                  </Button>
+                ))}
+              </div>
               <p className="lead">{product?.description}</p>
               <Button
                 variant="outline-dark"

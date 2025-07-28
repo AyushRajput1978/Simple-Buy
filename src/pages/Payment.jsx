@@ -36,7 +36,7 @@ const Payment = () => {
   const [name, setName] = useState("");
 
   const subtotal = cart.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + item.priceAtTime * item.quantity,
     0
   );
   const shipping = 30;
