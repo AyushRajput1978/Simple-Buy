@@ -34,3 +34,22 @@ export const handleChange = (e, setFormData) => {
 export const toast = (message, success = true) => {
   store.dispatch(showToast({ message, success }));
 };
+
+export const capitaliseFirstAlphabet = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+export const getStatusColor = {
+  confirmed: "warning",
+  disptached: "secondary",
+  "out for delivery": "info",
+  delivered: "success",
+  cancelled: "danger",
+};
+export const getStatusLabel = {
+  confirmed: "Order Placed",
+  dispatched: "Shipped",
+  "out for delivery": "Out for delivery",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};

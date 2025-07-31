@@ -106,6 +106,13 @@ const Navbar = () => {
                         Dashboard
                       </NavLink>
                     )}
+
+                    {user.role === "user" && (
+                      <NavLink className="dropdown-item" to="/user-orders">
+                        <MdSyncLock className="me-2" />
+                        My Orders
+                      </NavLink>
+                    )}
                     <NavLink className="dropdown-item" to="/password-reset">
                       <MdSyncLock className="me-2" />
                       Change Password

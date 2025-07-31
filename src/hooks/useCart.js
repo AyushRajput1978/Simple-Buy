@@ -18,7 +18,7 @@ const useCart = () => {
 
   const addToCart = async (productId, variantId, quantity) => {
     try {
-      const res = await axios({
+      await axios({
         method: "post",
         url: "/cart/add",
         data: {

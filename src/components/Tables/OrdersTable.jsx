@@ -19,7 +19,7 @@ import {
   FaRegCheckSquare,
 } from "react-icons/fa";
 import { TableLoadingShimmer } from "../layout/LoadingShimmers";
-import { toast } from "../../utils/helper";
+import { getStatusColor, getStatusLabel, toast } from "../../utils/helper";
 import ConfirmModal from "../layout/AlertModal";
 
 const statusOptions = [
@@ -49,9 +49,6 @@ const statusOptions = [
   },
 ];
 
-const getStatusColor = (status) =>
-  statusOptions.find((s) => s.value === status)?.color || "secondary";
-
 const OrdersTable = () => {
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -74,7 +71,7 @@ const OrdersTable = () => {
     try {
       await axios.patch(`/dashboard/orders/${id}`, { status });
       toast(`Order status marked as "${status}" successfully`);
-      refetch();
+      refetchOrders();
     } catch (err) {
       toast("Failed to update status", false);
     }
@@ -100,12 +97,6 @@ const OrdersTable = () => {
   if (isLoading || loading) {
     return <TableLoadingShimmer />;
   }
-
-  const renderStatusBadge = (status) => (
-    <Badge className="fw-normal" bg={getStatusColor(status)}>
-      {status.toUpperCase()}
-    </Badge>
-  );
 
   const renderDropdownItems = (order) => (
     <>
@@ -161,7 +152,11 @@ const OrdersTable = () => {
                       ))}
                     </td>
                     <td>{order.totalAmount}</td>
-                    <td>{renderStatusBadge(order.status)}</td>
+                    <td>
+                      <Badge bg={getStatusColor[order.status]}>
+                        {getStatusLabel[order.status]}
+                      </Badge>
+                    </td>
                     <td>{order.user?.name || "Guest"}</td>
                     <td>
                       {order.shippingAddress?.address},{" "}

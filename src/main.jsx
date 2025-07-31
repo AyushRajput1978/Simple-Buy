@@ -38,6 +38,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import DashboardOrders from "./pages/Dashboard/Orders";
 import CustomToast from "./components/layout/CustomToast";
+import UserOrders from "./pages/UserOrders";
 
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -60,6 +61,7 @@ root.render(
                     <Route path="/contact" element={<ContactPage />} />
                     <Route path="/profile" element={<MyProfile />} />
                     {/* Order related routes */}
+                    <Route path="/user-orders" element={<UserOrders />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/payment" element={<Payment />} />
                     {/* Authentication related routes */}
