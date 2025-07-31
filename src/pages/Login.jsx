@@ -9,10 +9,12 @@ import Cookies from "js-cookie";
 import axios from "../axios";
 import { setAuth } from "../redux/reducer/authSlice";
 import { toast } from "../utils/helper";
+import useCart from "../hooks/useCart";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { fetchCart } = useCart();
   const [form, setForm] = useState({ email: "", password: "" });
 
   const loginHandler = useMutation({
@@ -33,6 +35,7 @@ const Login = () => {
         navigate("/dashboard");
       } else {
         navigate("/");
+        fetchCart();
       }
     },
     onError: (err) => {

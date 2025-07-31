@@ -11,6 +11,7 @@ import defaultAvatar from "/assets/default-avatar.jpg";
 import { logout } from "../redux/reducer/authSlice";
 import useCart from "../hooks/useCart";
 import { Container, Nav } from "react-bootstrap";
+import { cartItemsSet } from "../redux/reducer/cartSlice";
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
@@ -21,6 +22,7 @@ const Navbar = () => {
   const logoutHandler = () => {
     dispatch(logout());
     Cookies.remove("JWT");
+    dispatch(cartItemsSet([]));
     navigate("/");
   };
   const navLinks = [
