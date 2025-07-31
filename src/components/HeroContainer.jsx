@@ -1,6 +1,6 @@
 import { Card, Container } from "react-bootstrap";
 
-const Home = () => {
+const HeroContainer = () => {
   return (
     <>
       <Card
@@ -24,4 +24,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HeroContainer;
