@@ -32,9 +32,13 @@ Start the server
 
 ## Tech Stack
 
-- [React](https://reactjs.org/)
-- [Redux](https://redux.js.org/)
-- [Bootstrap](https://getbootstrap.com/)
+-Frontend: React, Redux Toolkit
+-UI Library: Bootstrap 5 (customized)
+-Routing: React Router
+-State Management: Redux Toolkit
+-Payment: Stripe
+-Notifications: react-toastify
+-API: REST API from Express backend (hosted on Railway)
 
 
 src/
@@ -65,29 +69,18 @@ src/
 ├── custom-theme.css/.scss       # Custom Bootstrap theme
 
 
-🚀 Features
-🔐 User Authentication (Register/Login/Password Reset)
-
-📦 Product listing and filtering
-
-🛒 Cart management using Redux
-
-💳 Payment Integration (Stripe)
-
-⭐ Product reviews and ratings
-
-🧑‍💼 Admin Dashboard to manage:
-
-Products
-
-Categories
-
-Users
-
-Orders
-
-🌐 Responsive design
-
-💬 Toast-based notifications
+## Features
+- User Authentication (Register/Login/Password Reset)
+- Product listing and filtering
+- Cart management using Redux
+- Payment Integration (Stripe)
+- Product reviews and ratings
+- Admin Dashboard to manage:
+- Products
+- Categories
+- Users
+- Orders
+- Responsive design
+- Toast-based notifications
 
 

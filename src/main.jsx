@@ -29,7 +29,7 @@ import ErrorBoundary from "./components/Errorboundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DashboardHome from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/ProtectedRoutes";
-import DashboardLayout from "./components/dashboardLayout";
+import DashboardLayout from "./components/DashboardLayout";
 import "./main.css";
 import ProductCategories from "./pages/Dashboard/ProductCategories";
 import DashboardProducts from "./pages/Dashboard/Products";
