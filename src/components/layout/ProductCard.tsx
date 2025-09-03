@@ -1,32 +1,33 @@
-import { useState } from "react";
-import { Badge, Button, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Badge, Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import type { Product } from 'type';
 
-const ProductCard = ({ product, addProduct }) => {
+interface ProductCardProps {
+  product: Product;
+  addProduct: (product: Product, varaintId: string) => void;
+}
+
+const ProductCard = ({ product, addProduct }: ProductCardProps) => {
+  const vId = product.variants[0] ? product.variants[0].id : undefined;
   return (
     <Card className="shadow-sm w-100 h-100 product-card product-card-hover border-0">
       <Card.Img
         variant="top"
         src={product.image}
         alt={product.name}
-        style={{ height: "300px", objectFit: "contain" }}
+        style={{ height: '300px', objectFit: 'contain' }}
         className="p-3"
       />
       <Card.Body className="d-flex flex-column">
         <div className="text-end">
           <Badge bg="secondary" className="text-capitalize ms-2">
-            {product.category?.name || "General"}
+            {product.category?.name || 'General'}
           </Badge>
         </div>
         <div className="d-flex justify-content-between align-items-center mb-2">
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>{product.name}</Tooltip>}
-          >
+          <OverlayTrigger placement="top" overlay={<Tooltip>{product.name}</Tooltip>}>
             <Card.Title className="mb-0">
-              {product.name.length > 30
-                ? `${product.name.substring(0, 30)}...`
-                : product.name}
+              {product.name.length > 30 ? `${product.name.substring(0, 30)}...` : product.name}
             </Card.Title>
           </OverlayTrigger>
         </div>
@@ -52,24 +53,21 @@ const ProductCard = ({ product, addProduct }) => {
         </div>
 
         <div className="mt-auto">
-          <Button
-            as={Link}
+          <Link
             to={`/product/${product.id}`}
-            style={{
-              backgroundColor: "var(--color-cta)",
-              border: "none",
-            }}
-            className="me-2 text-white"
+            className="btn me-2 text-white"
+            style={{ backgroundColor: 'var(--color-cta)', border: 'none' }}
           >
             Buy Now
-          </Button>
+          </Link>
           <Button
             style={{
-              borderColor: "var(--color-primary)",
-              color: "var(--color-primary)",
+              borderColor: 'var(--color-primary)',
+              color: 'var(--color-primary)',
             }}
             variant="outline"
-            onClick={() => addProduct(product, product.variants[0].id)}
+            onClick={() => vId && addProduct(product, vId)}
+            disabled={!vId}
           >
             Add to Cart
           </Button>
