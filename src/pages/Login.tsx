@@ -1,49 +1,60 @@
-import { useState } from "react";
-import { Button, Col, Container, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useMutation } from "@tanstack/react-query";
-import Cookies from "js-cookie";
+import { useMutation } from '@tanstack/react-query';
+import type { AxiosResponse } from 'axios';
+import Cookies from 'js-cookie';
+import { useState } from 'react';
+import { Button, Col, Container, Row } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
+import type { ApiError, User } from 'type';
 
-import axios from "../axios";
-import { setAuth } from "../redux/reducer/authSlice";
-import { toast } from "../utils/helper";
-import useCart from "../hooks/useCart";
+import axios from '../axios';
+import useCart from '../hooks/useCart';
+import { setAuth } from '../redux/reducer/authSlice';
+import { toast } from '../utils/helper';
 
+interface LoginResponse {
+  data: {
+    user: User;
+    token: string;
+  };
+}
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { fetchCart } = useCart();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState<LoginFormData>({ email: '', password: '' });
 
-  const loginHandler = useMutation({
-    mutationFn: async (formData) => {
-      return axios.post("/user/login", formData);
+  const loginHandler = useMutation<AxiosResponse<LoginResponse>, ApiError, LoginFormData>({
+    mutationFn: async (formData: LoginFormData) => {
+      return axios.post<LoginResponse>('/user/login', formData);
     },
     onSuccess: (res) => {
       const { user, token } = res.data.data;
-      Cookies.set("JWT", token, {
+      Cookies.set('JWT', token, {
         expires: 2,
         secure: true,
-        sameSite: "Strict",
+        sameSite: 'Strict',
       });
 
       dispatch(setAuth({ user }));
 
-      if (user.role === "admin" || user.role === "superAdmin") {
-        navigate("/dashboard");
+      if (user.role === 'admin' || user.role === 'superAdmin') {
+        navigate('/dashboard');
       } else {
-        navigate("/");
-        fetchCart();
+        navigate('/');
+        void fetchCart();
       }
     },
-    onError: (err) => {
-      toast(err.response.data.message);
+    onError: (err: ApiError) => {
+      toast(err.message);
     },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     loginHandler.mutate(form);
   };
@@ -84,11 +95,8 @@ const Login = () => {
             </div>
             <div className="my-3">
               <p>
-                New Here?{" "}
-                <Link
-                  to="/register"
-                  className="text-decoration-underline text-info"
-                >
+                New Here?{' '}
+                <Link to="/register" className="text-decoration-underline text-info">
                   Register
                 </Link>
               </p>
@@ -98,9 +106,9 @@ const Login = () => {
                 variant="dark"
                 className="my-2 mx-auto "
                 type="submit"
-                disabled={loginHandler.isLoading}
+                disabled={loginHandler.isPending}
               >
-                {loginHandler.isLoading ? "Logging in..." : "Login"}
+                {loginHandler.isPending ? 'Logging in...' : 'Login'}
               </Button>
             </div>
           </form>

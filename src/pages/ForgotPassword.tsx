@@ -1,25 +1,33 @@
-import { useState } from "react";
-import axios from "../axios";
-import { Button, Col, Container, Row, Form } from "react-bootstrap";
+import type { AxiosError } from 'axios';
+import React, { useState } from 'react';
+import { Button, Col, Container, Row, Form } from 'react-bootstrap';
+import type { ApiError } from 'type';
+
+import axios from '../axios';
+
+interface SubmitResponse {
+  message: string;
+}
 
 const ForgotPassword = () => {
   const resetUrl = `${import.meta.env.VITE_SITE_URL}/password-reset`;
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const submitHandler = async (e) => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       setIsLoading(true);
-      const res = await axios.post("/user/forgot-password", {
+      const res = await axios.post<SubmitResponse>('/user/forgot-password', {
         email,
         resetUrl,
       });
-      alert(res.data.message || "Reset link sent to your email.");
+      alert(res.data.message || 'Reset link sent to your email.');
     } catch (err) {
-      const msg = err?.response?.data?.message || "Something went wrong!";
+      const error = err as AxiosError<ApiError>;
+      const msg = error?.response?.data?.message || 'Something went wrong!';
       alert(msg);
     } finally {
       setIsLoading(false);
@@ -44,12 +52,8 @@ const ForgotPassword = () => {
               />
             </Form.Group>
             <div className="text-center">
-              <Button
-                variant="dark"
-                type="submit"
-                disabled={isLoading || !email}
-              >
-                {isLoading ? "Submitting..." : "Submit"}
+              <Button variant="dark" type="submit" disabled={isLoading || !email}>
+                {isLoading ? 'Submitting...' : 'Submit'}
               </Button>
             </div>
           </Form>

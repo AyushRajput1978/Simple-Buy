@@ -1,5 +1,5 @@
-import {  Product } from "../components";
-import HeroContainer from "../components/HeroContainer";
+import { Product } from '../components';
+import HeroContainer from '../components/HeroContainer';
 
 function Home() {
   return (

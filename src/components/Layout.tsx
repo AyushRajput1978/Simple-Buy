@@ -15,10 +15,9 @@ const Layout = () => {
   function getSessionId() {
     let sessionId = localStorage.getItem('sessionId');
     if (!sessionId) {
-      sessionId = crypto.randomUUID(); // modern browsers
+      sessionId = crypto.randomUUID();
       localStorage.setItem('sessionId', sessionId);
     }
-    // return sessionId;
   }
   const authToken = Cookies.get('JWT');
   useEffect(() => {

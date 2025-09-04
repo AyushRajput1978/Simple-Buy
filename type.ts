@@ -9,6 +9,10 @@ export interface Category {
   _id: string;
   name: string;
 }
+export interface Review {
+  id: string;
+  comment: string;
+}
 export interface Product {
   brand: string;
   category: Category;
@@ -22,6 +26,10 @@ export interface Product {
   ratingsQuantity: number;
   slug: string;
   variants: Variant[];
+}
+
+export interface DetailedProduct extends Product {
+  reviews: Review[];
 }
 
 export interface Address {

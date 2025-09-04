@@ -1,25 +1,29 @@
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useState } from 'react';
+import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
-import useCart from "../hooks/useCart";
-import axios from "../axios";
-import { toast } from "../utils/helper";
+import axios from '../axios';
+import useCart from '../hooks/useCart';
+import { toast } from '../utils/helper';
+
+interface PaymentResponse {
+  clientSecret: string;
+}
 
 const CARD_ELEMENT_OPTIONS = {
   style: {
     base: {
-      fontSize: "16px",
-      color: "#32325d",
-      fontFamily: "Arial, sans-serif",
-      "::placeholder": {
-        color: "#aab7c4",
+      fontSize: '16px',
+      color: '#32325d',
+      fontFamily: 'Arial, sans-serif',
+      '::placeholder': {
+        color: '#aab7c4',
       },
-      padding: "10px 12px",
+      padding: '10px 12px',
     },
     invalid: {
-      color: "#fa755a",
+      color: '#fa755a',
     },
   },
 };
@@ -30,63 +34,65 @@ const Payment = () => {
   const elements = useElements();
   const navigate = useNavigate();
 
-  const [clientSecret, setClientSecret] = useState("");
+  // const [clientSecret, setClientSecret] = useState('');
   const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState("");
-  const [name, setName] = useState("");
+  const [error, setError] = useState('');
+  const [name, setName] = useState('');
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.priceAtTime * item.quantity,
-    0
-  );
+  const subtotal = cart.reduce((sum, item) => sum + item.priceAtTime * item.quantity, 0);
   const shipping = 30;
   const total = subtotal + shipping;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setProcessing(true);
-    setError("");
+    setError('');
 
     if (!stripe || !elements) {
-      setError("Stripe has not loaded yet.");
+      setError('Stripe has not loaded yet.');
       setProcessing(false);
       return;
     }
+    const cardElement = elements.getElement(CardElement);
 
+    if (!cardElement) {
+      setError('Card element not found.');
+      setProcessing(false);
+      return;
+    }
     try {
-      const { data } = await axios.post("/payment/create-payment-intent", {
+      const { data } = await axios.post<PaymentResponse>('/payment/create-payment-intent', {
         subtotal,
         shipping,
       });
-
-      setClientSecret(data.clientSecret);
-
+      // setClientSecret(data.clientSecret);
+      console.log(data, 'data haia na');
       const paymentResult = await stripe.confirmCardPayment(data.clientSecret, {
         payment_method: {
-          card: elements.getElement(CardElement),
+          card: cardElement,
           billing_details: {
             name,
             address: {
-              line1: "123 Street",
-              city: "Mumbai",
-              postal_code: "400001",
-              country: "IN",
+              line1: '123 Street',
+              city: 'Mumbai',
+              postal_code: '400001',
+              country: 'IN',
             },
           },
         },
       });
 
       if (paymentResult.error) {
-        setError(paymentResult.error.message);
+        setError(paymentResult.error.message || 'Payment Failed');
         setProcessing(false);
-      } else if (paymentResult.paymentIntent.status === "succeeded") {
-        toast("Payment Successful");
-        fetchCart();
-        setTimeout(() => navigate("/"), 3000);
+      } else if (paymentResult.paymentIntent.status === 'succeeded') {
+        toast('Payment Successful');
+        void fetchCart();
+        setTimeout(() => navigate('/'), 3000);
       }
     } catch (err) {
       console.error(err);
-      setError("Payment failed. Please try again.");
+      setError('Payment failed. Please try again.');
       setProcessing(false);
     }
   };
@@ -100,9 +106,7 @@ const Payment = () => {
               <h4 className="mb-0">Payment Summary</h4>
             </Card.Header>
             <Card.Body className="payment-summary">
-              <p className="mb-4 text-muted">
-                Enter your payment details below
-              </p>
+              <p className="mb-4 text-muted">Enter your payment details below</p>
 
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
@@ -135,12 +139,8 @@ const Payment = () => {
                   </h5>
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={processing}
-                  className="w-100 btn-cta"
-                >
-                  {processing ? "Processing..." : `Pay $${total.toFixed(2)}`}
+                <Button type="submit" disabled={processing} className="w-100 btn-cta">
+                  {processing ? 'Processing...' : `Pay $${total.toFixed(2)}`}
                 </Button>
               </Form>
 
