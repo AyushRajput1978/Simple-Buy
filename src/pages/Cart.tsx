@@ -1,26 +1,31 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { FaArrowLeft } from "react-icons/fa6";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Container,
-  Row,
-} from "react-bootstrap";
+import { useState, useMemo } from 'react';
+import { Button, Card, CardBody, CardHeader, Col, Container, Row } from 'react-bootstrap';
+import { FaArrowLeft } from 'react-icons/fa6';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import type { CartItem, Product, RootState, User } from 'type';
 
-import useCart from "../hooks/useCart";
-import ConfirmModal from "../components/layout/AlertModal";
+import ConfirmModal from '../components/layout/AlertModal';
+import useCart from '../hooks/useCart';
+
+interface ShowCartProps {
+  cart: CartItem[];
+  subtotal: number;
+  userData: User;
+  totalItems: number;
+  handleAddItem: (product: Product, variantId: string) => void;
+  handleRemoveItem: (product: Product, variantId: string) => void;
+  showConfirmModal: boolean;
+  setShowConfirmModal: (state: boolean) => void;
+  handleConfirmClear: () => void;
+}
 
 const SHIPPING_COST = 30.0;
 
 const Cart = () => {
   const { cart, deleteCart, updateCart } = useCart();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const userData = useSelector((state) => state.auth.user);
+  const userData = useSelector((state: RootState) => state.auth.user);
   const { subtotal, totalItems } = useMemo(() => {
     return cart.reduce(
       (acc, item) => {
@@ -28,16 +33,18 @@ const Cart = () => {
         acc.totalItems += item.quantity;
         return acc;
       },
-      { subtotal: 0, totalItems: 0 }
+      { subtotal: 0, totalItems: 0 },
     );
   }, [cart]);
 
-  const handleAddItem = (product, variantId) =>
-    updateCart(product.id, variantId, "increment");
-  const handleRemoveItem = (product, variantId) =>
-    updateCart(product.id, variantId, "decrement");
+  const handleAddItem = (product: Product, variantId: string) => {
+    void updateCart(product.id, variantId, 'increment');
+  };
+  const handleRemoveItem = (product: Product, variantId: string) => {
+    void updateCart(product.id, variantId, 'decrement');
+  };
   const handleConfirmClear = () => {
-    deleteCart();
+    void deleteCart();
     setShowConfirmModal(false);
   };
 
@@ -85,25 +92,19 @@ const ShowCart = ({
   showConfirmModal,
   setShowConfirmModal,
   handleConfirmClear,
-}) => (
+}: ShowCartProps) => (
   <Container className="py-4">
     <Row className="justify-content-center gx-5">
       <Col lg={8}>
         <Card className="mb-4 rounded-4 border-0">
           <CardHeader className="d-flex justify-content-between align-items-center bg-white border-0">
-            <h2 className="mb-0 fw-semibold text-primary fs-5">
-              Items in Cart
-            </h2>
-            <Button
-              variant="outline-danger"
-              size="sm"
-              onClick={() => setShowConfirmModal(true)}
-            >
+            <h2 className="mb-0 fw-semibold text-primary fs-5">Items in Cart</h2>
+            <Button variant="outline-danger" size="sm" onClick={() => setShowConfirmModal(true)}>
               Clear Cart
             </Button>
           </CardHeader>
           <CardBody>
-            {cart.map((item) => (
+            {cart.map((item: CartItem) => (
               <div key={item.product.id}>
                 <Row className="align-items-center mb-4">
                   <Col md={2} xs={4}>
@@ -111,7 +112,7 @@ const ShowCart = ({
                       src={item.product.image}
                       alt={item.product.name}
                       className="img-fluid rounded border"
-                      style={{ height: "75px", objectFit: "contain" }}
+                      style={{ height: '75px', objectFit: 'contain' }}
                     />
                   </Col>
 
@@ -121,8 +122,7 @@ const ShowCart = ({
                       Size: {item.attributeValue} {item.attributeName}
                     </small>
                     <div className="fw-bol fs-5">
-                      ${item.priceAtTime || item.product.price} ×{" "}
-                      {item.quantity}
+                      ${item.priceAtTime || item.product.price} × {item.quantity}
                     </div>
                   </Col>
 
@@ -134,9 +134,7 @@ const ShowCart = ({
                       <Button
                         variant="light"
                         className="px-3 py-2 border-end"
-                        onClick={() =>
-                          handleRemoveItem(item.product, item.variantId)
-                        }
+                        onClick={() => handleRemoveItem(item.product, item.variantId)}
                       >
                         <i className="fas fa-minus" />
                       </Button>
@@ -144,9 +142,7 @@ const ShowCart = ({
                       <Button
                         variant="light"
                         className="px-3 py-2 border-start"
-                        onClick={() =>
-                          handleAddItem(item.product, item.variantId)
-                        }
+                        onClick={() => handleAddItem(item.product, item.variantId)}
                       >
                         <i className="fas fa-plus" />
                       </Button>
@@ -177,15 +173,10 @@ const ShowCart = ({
               </li>
               <li className="list-group-item d-flex justify-content-between bg-light rounded">
                 <strong>Total</strong>
-                <strong className="text-cta">
-                  ${Math.round(subtotal + SHIPPING_COST)}
-                </strong>
+                <strong className="text-cta">${Math.round(subtotal + SHIPPING_COST)}</strong>
               </li>
             </ul>
-            <Link
-              to={userData ? "/payment" : "/register"}
-              className="btn btn-cta w-100"
-            >
+            <Link to={userData ? '/payment' : '/register'} className="btn btn-cta w-100">
               Go to Checkout
             </Link>
           </CardBody>

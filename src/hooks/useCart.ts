@@ -1,26 +1,40 @@
-import { useDispatch, useSelector } from "react-redux";
-import axios from "../axios";
-import { cartItemsSet } from "../redux/reducer/cartSlice";
-import { toast } from "../utils/helper";
+import type { AxiosError } from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import type { ApiError, CartItem, RootState } from 'type';
+
+import axios from '../axios';
+import { cartItemsSet } from '../redux/reducer/cartSlice';
+import { toast } from '../utils/helper';
+
+interface AddToCartProps {
+  productId: string;
+  variantId: string;
+  quantity: number;
+}
+interface CartResponse {
+  data: {
+    items: CartItem[];
+  };
+}
 
 const useCart = () => {
   const dispatch = useDispatch();
-  const cart = useSelector((state) => state.userCart.cart || []);
+  const cart = useSelector((state: RootState) => state.userCart.cart || []);
 
   const fetchCart = async () => {
     try {
-      const res = await axios("/cart");
+      const res = await axios.get<CartResponse>('/cart');
       dispatch(cartItemsSet(res.data.data.items));
     } catch (error) {
-      console.error("Error fetching cart data:", error);
+      console.error('Error fetching cart data:', error);
     }
   };
 
-  const addToCart = async (productId, variantId, quantity) => {
+  const addToCart = async ({ productId, variantId, quantity }: AddToCartProps) => {
     try {
       await axios({
-        method: "post",
-        url: "/cart/add",
+        method: 'post',
+        url: '/cart/add1',
         data: {
           productId,
           variantId,
@@ -28,22 +42,22 @@ const useCart = () => {
         },
       });
 
-      fetchCart();
-      toast("Product added successfully");
+      void fetchCart();
+      toast('Product added successfully');
     } catch (err) {
-      toast(err.response?.data?.message || "Error adding to cart.", false);
+      const error = err as AxiosError<ApiError>;
+      toast(error.message || 'Error adding to cart.', false);
     }
   };
   const updateCart = async (
-    productId,
-    variantId,
-    action
-    // variantId
-  ) => {
+    productId: string,
+    variantId: string,
+    action: string,
+  ): Promise<void> => {
     try {
-      const res = await axios({
-        method: "post",
-        url: "/cart/update",
+      await axios({
+        method: 'post',
+        url: '/cart/update',
         data: {
           productId,
           variantId,
@@ -51,10 +65,11 @@ const useCart = () => {
         },
       });
 
-      fetchCart();
-      toast("Product updated successfully");
+      void fetchCart();
+      toast('Product updated successfully');
     } catch (err) {
-      toast(err.response?.data?.message || "Error adding to cart.", false);
+      const error = err as AxiosError<ApiError>;
+      toast(error.response?.data?.message || 'Error adding to cart.', false);
     }
   };
 
@@ -154,14 +169,15 @@ const useCart = () => {
   //   };
   const deleteCart = async () => {
     try {
-      const res = await axios({
-        method: "post",
-        url: "/cart/clear",
+      await axios({
+        method: 'post',
+        url: '/cart/clear',
       });
-      fetchCart();
-      toast("Cart is cleared successfully");
+      void fetchCart();
+      toast('Cart is cleared successfully');
     } catch (err) {
-      toast(err.response.data.message, false);
+      const error = err as AxiosError<ApiError>;
+      toast(error?.response?.data.message, false);
     }
   };
 
