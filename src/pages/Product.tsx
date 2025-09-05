@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import Marquee from 'react-fast-marquee';
 import { Link, useParams } from 'react-router-dom';
-import type { DetailedProduct, Product, Variant } from 'type';
+import type { DetailedProduct, ProductType, Variant } from 'type';
 
 import axios from '../axios';
 import {
   DetailedProductLoadingShimmer,
   SimilarProductsLoadingShimmer,
 } from '../components/layout/LoadingShimmers';
+import NoProduct from '../components/layout/NoProduct';
 import ProductCard from '../components/layout/ProductCard';
 import Reviews from '../components/Reviews';
 import useCart from '../hooks/useCart';
@@ -21,7 +22,7 @@ interface ProductResponse {
 }
 interface SimilarProductsResponse {
   data: {
-    similarProducts: Product[];
+    similarProducts: ProductType[];
   };
 }
 const Product = () => {
@@ -35,7 +36,7 @@ const Product = () => {
   });
   const { addToCart } = useCart();
 
-  const addProduct = (product: Product) => {
+  const addProduct = (product: ProductType) => {
     void addToCart({ productId: product.id, variantId: selectedVariant.id, quantity: 1 });
   };
 
@@ -62,7 +63,7 @@ const Product = () => {
     queryKey,
   }: {
     queryKey: [string, string];
-  }): Promise<Product[]> => {
+  }): Promise<ProductType[]> => {
     const [_, id] = queryKey;
     const res = await axios.get<SimilarProductsResponse>(`/products/${id}/similar`);
 
@@ -85,8 +86,7 @@ const Product = () => {
       setSelectedVariant(defaultVariant);
     }
   }, [product]);
-  console.log(product, 'product');
-  const ShowProduct = () => {
+  const ShowProduct = ({ product }: { product: DetailedProduct }) => {
     return (
       <Container className="my-5 py-2">
         <Row>
@@ -102,22 +102,21 @@ const Product = () => {
           <Col md={6} className="py-3">
             <small className="text-uppercase text-muted fs-5">{product?.category.name}</small>
             <h1 className="display-6">{product?.name}</h1>
-            <RatingStars ratings={product?.ratingsAverage} />
+            <RatingStars ratings={product?.ratingsAverage} reviews={product?.reviews} />
             <p className="fs-4 my-3">₹{selectedVariant.regularPrice}</p>
             <div className="d-flex gap-2 mb-2">
               <span className="my-auto">Size:</span>
-              {product &&
-                product.variants.map((varnt) => (
-                  <Button
-                    variant="outline-primary"
-                    disabled={varnt.attributeValue === selectedVariant.attributeValue}
-                    onClick={() => {
-                      setSelectedVariant(varnt);
-                    }}
-                  >
-                    {varnt.attributeValue}
-                  </Button>
-                ))}
+              {product.variants.map((varnt) => (
+                <Button
+                  variant="outline-primary"
+                  disabled={varnt.attributeValue === selectedVariant.attributeValue}
+                  onClick={() => {
+                    setSelectedVariant(varnt);
+                  }}
+                >
+                  {varnt.attributeValue}
+                </Button>
+              ))}
             </div>
             <p className="lead">{product?.description}</p>
             <Button variant="outline-dark" onClick={() => addProduct(product)}>
@@ -136,7 +135,7 @@ const Product = () => {
     return (
       <div className="py-4 my-4">
         <Row className="g-4">
-          {similarProducts.map((product) => (
+          {similarProducts?.map((product) => (
             <Col key={product.id} md={4} sm={6} xs={12} className="d-flex">
               <ProductCard product={product} addProduct={addProduct} />
             </Col>
@@ -148,12 +147,28 @@ const Product = () => {
 
   return (
     <Container className="my-5 py-4 px-4 rounded product-detail-section">
-      <Row>{productLoading ? <DetailedProductLoadingShimmer /> : <ShowProduct />}</Row>
+      <Row>
+        {productLoading ? (
+          <DetailedProductLoadingShimmer />
+        ) : product ? (
+          <ShowProduct product={product} />
+        ) : (
+          <NoProduct
+            title="This Product is not available any more."
+            message="But you can check out similar items in our catalog."
+            onRefresh={() => window.location.reload()}
+          />
+        )}
+      </Row>
       <Row className="my-5 py-5">
         <div className="d-none d-md-block">
           <h2 className="">You may also Like</h2>
           <Marquee pauseOnHover={true} pauseOnClick={true} speed={50} autoFill={true}>
-            {simlarProductLoading ? <SimilarProductsLoadingShimmer /> : <ShowSimilarProduct />}
+            {simlarProductLoading ? (
+              <SimilarProductsLoadingShimmer />
+            ) : (
+              similarProducts && <ShowSimilarProduct />
+            )}
           </Marquee>
         </div>
       </Row>

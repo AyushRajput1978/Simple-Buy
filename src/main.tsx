@@ -17,7 +17,6 @@ import CustomToast from './components/layout/CustomToast';
 import ProtectedRoute from './components/ProtectedRoutes';
 import {
   Home,
-  Product,
   Products,
   AboutPage,
   ContactPage,
@@ -29,6 +28,7 @@ import {
   ResetPassword,
   Payment,
   MyProfile,
+  Product,
 } from './pages';
 import DashboardHome from './pages/Dashboard/Home';
 import './main.css';
@@ -58,7 +58,7 @@ root.render(
                 <Routes>
                   <Route element={<Layout />}>
                     <Route path="/" element={<Home />} />
-                    <Route path="/product" element={<Products />} />
+                    <Route path="/products" element={<Products />} />
                     <Route path="/product/:id" element={<Product />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/contact" element={<ContactPage />} />
@@ -72,7 +72,7 @@ root.render(
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/password-reset/:token?" element={<ResetPassword />} />
-                    <Route path="/product/*" element={<PageNotFound />} />
+                    <Route path="/products/*" element={<PageNotFound />} />
                   </Route>
                   {/* dashboard Routes */}
                   <Route

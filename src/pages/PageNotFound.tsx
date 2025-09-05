@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
-import { Navbar } from "../components";
-import { Col, Container, Row } from "react-bootstrap";
-import { FaArrowLeft } from "react-icons/fa6";
+import { Col, Container, Row } from 'react-bootstrap';
+import { FaArrowLeft } from 'react-icons/fa6';
+import { Link } from 'react-router-dom';
+
+import { Navbar } from '../components';
 
 const PageNotFound = () => {
   return (

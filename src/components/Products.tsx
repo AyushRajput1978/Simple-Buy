@@ -1,24 +1,33 @@
 import './index.css';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Button, Row, Col, Container } from 'react-bootstrap';
-import { useQuery } from '@tanstack/react-query';
 
 import axios from '../axios';
 import useCart from '../hooks/useCart';
-import ProductCard from './layout/ProductCard';
 import { ProductsLoadingShimmer } from './layout/LoadingShimmers';
-import type { Category, Product } from '../../type';
+import ProductCard from './layout/ProductCard';
+import type { Category, ProductType } from '../../type';
+
+interface ProductResponse {
+  status: string;
+  data: ProductType[];
+}
+interface ProductCategoriesResponse {
+  status: string;
+  data: Category[];
+}
 
 const Products = () => {
-  const [filter, setFilter] = useState<Product[]>([]);
+  const [filter, setFilter] = useState<ProductType[]>([]);
   const { addToCart } = useCart();
 
-  const addProduct = (product: Product, variantId?: string) => {
-    addToCart(product.id, variantId, 1);
+  const addProduct = (product: ProductType, variantId: string) => {
+    void addToCart({ productId: product.id, variantId: variantId, quantity: 1 });
   };
 
-  const fetchProductCategories = async () => {
-    const res = await axios('/product-categories');
+  const fetchProductCategories = async (): Promise<Category[]> => {
+    const res = await axios.get<ProductCategoriesResponse>('/product-categories');
     return res.data.data;
   };
   const { data: productCategories = [] } = useQuery<Category[]>({
@@ -26,11 +35,11 @@ const Products = () => {
     queryFn: fetchProductCategories,
   });
 
-  const fetchProducts = async () => {
-    const res = await axios('/products');
+  const fetchProducts = async (): Promise<ProductType[]> => {
+    const res = await axios.get<ProductResponse>('/products');
     return res.data.data;
   };
-  const { data: products, isLoading: isProductsLoading } = useQuery<Product[]>({
+  const { data: products, isLoading: isProductsLoading } = useQuery<ProductType[]>({
     queryKey: ['products'],
     queryFn: fetchProducts,
   });
@@ -40,7 +49,7 @@ const Products = () => {
   }, [products]);
 
   const filterProducts = (cat: string) => {
-    const updatedList = products?.filter((item: Product) => item.category.name === cat);
+    const updatedList = products?.filter((item: ProductType) => item.category.name === cat);
     setFilter(updatedList ?? []);
   };
   const ShowProducts = () => {
@@ -63,7 +72,7 @@ const Products = () => {
         </div>
 
         <Row className="g-4">
-          {filter?.map((product: Product) => (
+          {filter?.map((product: ProductType) => (
             <Col key={product.id} md={6} lg={4} className="d-flex align-items-stretch">
               <ProductCard product={product} addProduct={addProduct} />
             </Col>
@@ -74,25 +83,23 @@ const Products = () => {
   };
 
   return (
-    <>
-      <Container className=" my-3 py-3 product-section">
-        <Row>
-          <Col>
-            <h2 className="display-5 text-center text-primary">Latest Products</h2>
-            <hr
-              className="mx-auto"
-              style={{
-                width: '100px',
-                borderTop: '3px solid var(--color-accent)',
-              }}
-            />
-          </Col>
-        </Row>
-        <Row className="justify-content-center">
-          {isProductsLoading ? <ProductsLoadingShimmer /> : <ShowProducts />}
-        </Row>
-      </Container>
-    </>
+    <Container className=" my-3 py-3 product-section">
+      <Row>
+        <Col>
+          <h2 className="display-5 text-center text-primary">Latest Products</h2>
+          <hr
+            className="mx-auto"
+            style={{
+              width: '100px',
+              borderTop: '3px solid var(--color-accent)',
+            }}
+          />
+        </Col>
+      </Row>
+      <Row className="justify-content-center">
+        {isProductsLoading ? <ProductsLoadingShimmer /> : <ShowProducts />}
+      </Row>
+    </Container>
   );
 };
 

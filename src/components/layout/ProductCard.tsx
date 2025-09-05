@@ -1,10 +1,10 @@
 import { Badge, Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import type { Product } from 'type';
+import type { ProductType } from 'type';
 
 interface ProductCardProps {
-  product: Product;
-  addProduct: (product: Product, varaintId: string) => void;
+  product: ProductType;
+  addProduct: (product: ProductType, varaintId: string) => void;
 }
 
 const ProductCard = ({ product, addProduct }: ProductCardProps) => {

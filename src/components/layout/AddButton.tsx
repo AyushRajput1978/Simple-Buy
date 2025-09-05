@@ -1,21 +1,21 @@
-import PropTypes from "prop-types";
-import { Button } from "react-bootstrap";
+import PropTypes from 'prop-types';
+import { Button } from 'react-bootstrap';
 
-/**
- * Reusable Add Button Component
- * @param {string} label - Button text
- * @param {string} icon - FontAwesome or other icon class
- * @param {function} onClick - Callback function when button is clicked
- * @param {string} className - Additional Bootstrap classes (optional)
- * @param {boolean} disabled - Disable button state
- */
+interface AddButtonProps {
+  label: string;
+  icon: string;
+  onClick: () => void;
+  className: string;
+  disabled: boolean;
+}
+
 const AddButton = ({
-  label = "Add",
-  icon = "fa fa-plus",
+  label = 'Add',
+  icon = 'fa fa-plus',
   onClick,
-  className = "",
+  className = '',
   disabled = false,
-}) => {
+}: AddButtonProps) => {
   return (
     <Button
       type="button"

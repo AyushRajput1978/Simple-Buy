@@ -11,17 +11,17 @@ import {
   ModalHeader,
   ModalTitle,
   Row,
-} from "react-bootstrap";
-import { useEffect, useState } from "react";
+} from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 
-import { handleChange } from "../../utils/helper";
+import { handleChange } from '../../utils/helper';
 
 const initialFormState = {
-  addressLine: "",
-  city: "",
-  state: "",
-  country: "",
-  postalCode: "",
+  addressLine: '',
+  city: '',
+  state: '',
+  country: '',
+  postalCode: '',
   isDefault: false,
 };
 
@@ -51,7 +51,7 @@ const AddEditAddress = ({ show, handleClose, initialData, setAddresses }) => {
   };
   const saveHandler = () => {
     if (!isValidForm()) {
-      alert("Please fill in all required fields.");
+      alert('Please fill in all required fields.');
       return;
     }
 
@@ -65,14 +65,12 @@ const AddEditAddress = ({ show, handleClose, initialData, setAddresses }) => {
 
       if (initialData) {
         // Editing mode
-        updated = updated.map((addr) =>
-          addr.postalCode === initialData.postalCode ? form : addr
-        );
+        updated = updated.map((addr) => (addr.postalCode === initialData.postalCode ? form : addr));
       } else {
         // Add new
         updated.push(form);
       }
-
+      console.log(updated, 'updated hai na', form, 'form hai', initialData);
       return updated;
     });
 
@@ -83,44 +81,44 @@ const AddEditAddress = ({ show, handleClose, initialData, setAddresses }) => {
     <Modal show={show} onHide={handleCloseAndClear} centered>
       <ModalHeader closeButton>
         <ModalTitle className="fw-semibold">
-          {initialData ? "Edit Address" : "Add Address"}
+          {initialData ? 'Edit Address' : 'Add Address'}
         </ModalTitle>
       </ModalHeader>
       <ModalBody>
         <Row>
           {[
             {
-              name: "addressLine",
-              label: "House Number & Street",
-              placeholder: "Street",
+              name: 'addressLine',
+              label: 'House Number & Street',
+              placeholder: 'Street',
               required: true,
             },
             {
-              name: "city",
-              label: "City",
-              placeholder: "City",
+              name: 'city',
+              label: 'City',
+              placeholder: 'City',
               required: true,
             },
             {
-              name: "state",
-              label: "State",
-              placeholder: "State",
+              name: 'state',
+              label: 'State',
+              placeholder: 'State',
               required: true,
             },
             {
-              name: "country",
-              label: "Country",
-              placeholder: "Country",
+              name: 'country',
+              label: 'Country',
+              placeholder: 'Country',
               required: true,
             },
             {
-              name: "postalCode",
-              label: "Postal Code",
-              placeholder: "Postal Code",
+              name: 'postalCode',
+              label: 'Postal Code',
+              placeholder: 'Postal Code',
               required: true,
-              type: "number",
+              type: 'number',
             },
-          ].map(({ name, label, placeholder, required, type = "text" }) => (
+          ].map(({ name, label, placeholder, required, type = 'text' }) => (
             <Col md={12} className="mb-2" key={name}>
               <FormGroup>
                 <FormLabel className="fw-semibold">
@@ -143,9 +141,7 @@ const AddEditAddress = ({ show, handleClose, initialData, setAddresses }) => {
             <FormCheck
               label="Default Address"
               checked={form.isDefault}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, isDefault: e.target.checked }))
-              }
+              onChange={(e) => setForm((prev) => ({ ...prev, isDefault: e.target.checked }))}
             />
           </Col>
         </Row>

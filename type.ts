@@ -10,10 +10,15 @@ export interface Category {
   name: string;
 }
 export interface Review {
-  id: string;
   comment: string;
+  createdAt: string;
+  id: string;
+  images: string[];
+  product: string;
+  rating: number;
+  user: User;
 }
-export interface Product {
+export interface ProductType {
   brand: string;
   category: Category;
   description: string;
@@ -28,7 +33,7 @@ export interface Product {
   variants: Variant[];
 }
 
-export interface DetailedProduct extends Product {
+export interface DetailedProduct extends ProductType {
   reviews: Review[];
 }
 
@@ -56,7 +61,7 @@ export interface CartItem {
   attributeName: string;
   attributeValue: string;
   priceAtTime: number;
-  product: Product;
+  product: ProductType;
   quantity: number;
   variantId: string;
   _id: string;
@@ -79,9 +84,19 @@ export interface RootState {
   auth: AuthState;
   toast: ToastState;
 }
-
 export interface ApiError {
   message: string;
   status: number;
   stack: string;
+  response: { data: { message: string } };
+}
+
+export interface Address {
+  addressLine: string;
+  city: string;
+  country: string;
+  isDefault: boolean;
+  postalCode: string;
+  state: string;
+  // _id: string;
 }

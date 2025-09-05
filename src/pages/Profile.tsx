@@ -1,87 +1,111 @@
-import { useEffect, useState } from "react";
-import { Col, Row, Button, Card, Form, Container } from "react-bootstrap";
-import { useSelector } from "react-redux";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { Col, Row, Button, Card, Form, Container } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import type { Address, ApiError, RootState } from 'type';
 
-import axios from "../axios";
-import ImageUploader from "../components/layout/ImageUploader";
-import AddressCard from "../components/layout/AddressCard";
-import AddEditAddress from "../components/AddEditModals/AddEditAddress";
-import { handleChange, toast } from "../utils/helper";
+import axios from '../axios';
+import AddEditAddress from '../components/AddEditModals/AddEditAddress';
+import AddressCard from '../components/layout/AddressCard';
+import ImageUploader from '../components/layout/ImageUploader';
+import { handleChange, toast } from '../utils/helper';
 
+type FormState = {
+  name: string;
+  email: string;
+  phoneNo: string;
+  addresses: Address[];
+};
+
+type FormErrors = Partial<Record<keyof FormState, string>>;
 const MyProfile = () => {
-  const [profileImage, setProfileImage] = useState("");
+  const [profileImage, setProfileImage] = useState('');
   const [showAddressModal, setShowAddressModal] = useState(false);
-  const [editAddress, setEditAddress] = useState({});
+  const [editAddress, setEditAddress] = useState<Address | null>(null);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phoneNo: "",
-    addresses: [],
+  const [formData, setFormData] = useState<FormState>({
+    name: '',
+    email: '',
+    phoneNo: '',
+    addresses: [
+      {
+        addressLine: '',
+        city: '',
+        country: '',
+        isDefault: false,
+        postalCode: '',
+        state: '',
+        _id: '',
+      },
+    ],
   });
-  const [error, setError] = useState({
-    name: "",
-    email: "",
-    phoneNo: "",
-    addresses: "",
+  const [error, setError] = useState<FormErrors>({
+    name: '',
+    email: '',
+    phoneNo: '',
+    addresses: '',
   });
-  const userData = useSelector((state) => state.auth.user);
+  const userData = useSelector((state: RootState) => state.auth.user);
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       email: userData.email,
       name: userData.name,
       phoneNo: userData.phoneNo,
       addresses: userData.addresses,
-    });
+    }));
     setProfileImage(userData.photo);
   }, [userData]);
 
-  const { mutate } = useMutation({
-    mutationFn: async (data) => {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: FormData) => {
       return await axios({
-        method: "PATCH",
-        url: "/user/update-me",
+        method: 'PATCH',
+        url: '/user/update-me',
         data,
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["update-loggedin-user"]);
-      toast("Profile updated successfully");
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['update-loggedin-user'] });
+      toast('Profile updated successfully');
     },
-    onError: (error) => {
-      console.error("Failed to submit:", error);
-      toast(err.response?.data?.message || "Error updating profile", false);
+    onError: (error: ApiError) => {
+      toast(error.response?.data?.message || 'Error updating profile', false);
     },
   });
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const requiredFields = ["name", "email", "phoneNo"];
-    let newErrors = {};
+    const requiredFields: (keyof FormState)[] = ['name', 'email', 'phoneNo'];
+    const newErrors = { name: '', email: '', phoneNo: '', addresses: '' };
 
     requiredFields.forEach((field) => {
       if (!formData[field]) newErrors[field] = `*${field} is mandatory`;
     });
 
     setError(newErrors);
-    if (Object.keys(newErrors).length > 0) {
-      toast("Please fill all the mandatory fields", false);
+    if (Object.values(newErrors).some(Boolean)) {
+      toast('Please fill all the mandatory fields', false);
       return;
     }
     const form = new FormData();
-    for (const key in formData) {
-      if (key === "addresses")
-        form.append("addresses", JSON.stringify(formData.addresses));
-      else form.append(key, formData[key]);
-    }
-    form.append("photo", profileImage);
+    form.append('name', formData.name);
+    form.append('email', formData.email);
+    form.append('phoneNo', formData.phoneNo);
+    form.append('addresses', JSON.stringify(formData.addresses));
+    if (profileImage) form.append('photo', profileImage);
     mutate(form);
+  };
+
+  const applyAddresses: React.Dispatch<React.SetStateAction<Address[]>> = (updater) => {
+    setFormData((prev) => ({
+      ...prev,
+      addresses: typeof updater === 'function' ? updater(prev.addresses) : updater,
+    }));
   };
   return (
     <Container>
@@ -94,8 +118,9 @@ const MyProfile = () => {
                 <ImageUploader
                   img={profileImage}
                   setImg={setProfileImage}
-                  className="user-avatar large-avatar rounded-circle mx-auto mt-n7 mb-4"
+                  // className="user-avatar large-avatar rounded-circle mx-auto mt-n7 mb-4"
                   size="180 X 180"
+                  isLoading={isPending}
                 />
               </Col>
             </Row>
@@ -104,7 +129,7 @@ const MyProfile = () => {
               <Col sm={6} md={4} lg={3} className="mb-3">
                 <Form.Group id="firstName">
                   <Form.Label>
-                    Full Name<span className="text-danger">*</span>{" "}
+                    Full Name<span className="text-danger">*</span>{' '}
                   </Form.Label>
                   <Form.Control
                     required
@@ -120,7 +145,7 @@ const MyProfile = () => {
               <Col sm={6} md={4} lg={3} className="mb-3">
                 <Form.Group id="emal">
                   <Form.Label>
-                    Email<span className="text-danger">*</span>{" "}
+                    Email<span className="text-danger">*</span>{' '}
                   </Form.Label>
                   <Form.Control
                     required
@@ -136,7 +161,7 @@ const MyProfile = () => {
               <Col sm={6} md={4} lg={3} className="mb-3">
                 <Form.Group id="phone">
                   <Form.Label>
-                    Phone Number<span className="text-danger">*</span>{" "}
+                    Phone Number<span className="text-danger">*</span>{' '}
                   </Form.Label>
                   <Form.Control
                     required
@@ -158,13 +183,13 @@ const MyProfile = () => {
                 <Col key={address.addressLine} md={4}>
                   <AddressCard
                     address={address}
-                    setAddresses={(fn) =>
+                    setAddresses={(fn: (addresses: Address[]) => Address[]) =>
                       setFormData((prev) => ({
                         ...prev,
                         addresses: fn(prev.addresses),
                       }))
                     }
-                    onEdit={(address) => {
+                    onEdit={(address: Address) => {
                       setEditAddress(address);
                       setShowAddressModal(true);
                     }}
@@ -172,20 +197,13 @@ const MyProfile = () => {
                 </Col>
               ))}
               <Col>
-                <Button
-                  variant="link"
-                  onClick={() => setShowAddressModal(true)}
-                >
+                <Button variant="link" onClick={() => setShowAddressModal(true)}>
                   +Add Address
                 </Button>
               </Col>
             </Row>
             <div className="mt-3">
-              <Button
-                className="green-btn fontweigh-500"
-                type="submit"
-                variant="primary"
-              >
+              <Button className="green-btn fontweigh-500" type="submit" variant="primary">
                 Save
               </Button>
             </div>
@@ -196,14 +214,9 @@ const MyProfile = () => {
         show={showAddressModal}
         handleClose={() => {
           setShowAddressModal(false);
-          setEditAddress({});
+          setEditAddress(null);
         }}
-        setAddresses={(fn) =>
-          setFormData((prev) => ({
-            ...prev,
-            addresses: fn(prev.addresses),
-          }))
-        }
+        setAddresses={applyAddresses}
         initialData={editAddress}
       />
     </Container>

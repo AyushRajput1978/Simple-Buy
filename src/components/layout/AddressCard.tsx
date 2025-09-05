@@ -1,13 +1,22 @@
-import { Button, Card, Row, Col, Badge } from "react-bootstrap";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { Button, Card, Row, Col, Badge } from 'react-bootstrap';
+import { FaTrash, FaEdit } from 'react-icons/fa';
+import type { Address } from 'type';
 
-const AddressCard = ({ address, setAddresses, onEdit }) => {
+interface AddressCardPorps {
+  address: Address;
+  setAddresses: (fn: (addresses: Address[]) => Address[]) => void;
+  onEdit: (address: Address) => void;
+}
+const AddressCard = ({ address, setAddresses, onEdit }: AddressCardPorps) => {
   const handleDelete = () => {
-    setAddresses((prev) =>
-      prev.filter((a) => a.addressLine !== address.addressLine)
-    );
+    setAddresses((prev) => prev.filter((a) => a.addressLine !== address.addressLine));
   };
-
+  const fields: { label: string; name: keyof Address }[] = [
+    { label: 'City', name: 'city' },
+    { label: 'State', name: 'state' },
+    { label: 'Country', name: 'country' },
+    { label: 'Postal Code', name: 'postalCode' },
+  ];
   return (
     <Card className="mb-3 shadow-sm border-0">
       <Card.Header className="d-flex justify-content-between align-items-center bg-light">
@@ -34,12 +43,7 @@ const AddressCard = ({ address, setAddresses, onEdit }) => {
         </div>
       </Card.Header>
       <Card.Body>
-        {[
-          { label: "City", name: "city" },
-          { label: "State", name: "state" },
-          { label: "Country", name: "country" },
-          { label: "Postal Code", name: "postalCode" },
-        ].map(({ label, name }) => (
+        {fields.map(({ label, name }) => (
           <Row className="mb-1">
             <Col xs={4}>
               <strong>{label}</strong>

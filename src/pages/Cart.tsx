@@ -3,7 +3,7 @@ import { Button, Card, CardBody, CardHeader, Col, Container, Row } from 'react-b
 import { FaArrowLeft } from 'react-icons/fa6';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import type { CartItem, Product, RootState, User } from 'type';
+import type { CartItem, ProductType, RootState, User } from 'type';
 
 import ConfirmModal from '../components/layout/AlertModal';
 import useCart from '../hooks/useCart';
@@ -13,8 +13,8 @@ interface ShowCartProps {
   subtotal: number;
   userData: User;
   totalItems: number;
-  handleAddItem: (product: Product, variantId: string) => void;
-  handleRemoveItem: (product: Product, variantId: string) => void;
+  handleAddItem: (product: ProductType, variantId: string) => void;
+  handleRemoveItem: (product: ProductType, variantId: string) => void;
   showConfirmModal: boolean;
   setShowConfirmModal: (state: boolean) => void;
   handleConfirmClear: () => void;
@@ -37,10 +37,10 @@ const Cart = () => {
     );
   }, [cart]);
 
-  const handleAddItem = (product: Product, variantId: string) => {
+  const handleAddItem = (product: ProductType, variantId: string) => {
     void updateCart(product.id, variantId, 'increment');
   };
-  const handleRemoveItem = (product: Product, variantId: string) => {
+  const handleRemoveItem = (product: ProductType, variantId: string) => {
     void updateCart(product.id, variantId, 'decrement');
   };
   const handleConfirmClear = () => {
