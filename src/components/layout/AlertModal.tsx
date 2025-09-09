@@ -1,5 +1,14 @@
 import { Button, Modal } from "react-bootstrap";
 
+interface ConfirmModalProps{
+  showConfirmModal:boolean
+  setShowConfirmModal:(state:boolean)=>void,
+  handleConfirmClear:()=>void,
+  heading:string,
+  bodyText:string,
+  confirmText:string,
+}
+
 const ConfirmModal = ({
   showConfirmModal,
   setShowConfirmModal,
@@ -7,7 +16,7 @@ const ConfirmModal = ({
   heading,
   bodyText,
   confirmText,
-}) => {
+}:ConfirmModalProps) => {
   return (
     <Modal
       show={showConfirmModal}

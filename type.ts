@@ -1,3 +1,5 @@
+import type { ORDER_STATUSES } from '@/utils/helper';
+
 export interface Variant {
   attributeName: string;
   attributeValue: string;
@@ -23,6 +25,7 @@ export interface ProductType {
   category: Category;
   description: string;
   id: string;
+  _id: string;
   image: string;
   name: string;
   price: number;
@@ -100,3 +103,23 @@ export interface Address {
   state: string;
   // _id: string;
 }
+export interface OrderItem {
+  price: number;
+  product: ProductType;
+  quantity: number;
+  variant: { name: string; value: string };
+  variantId: string;
+  _id: string;
+  id: string;
+}
+export interface Order {
+  createdAt: string;
+  orderItems: OrderItem[];
+  shippingAddress: { address: string; city: string; postalCode: string; country: string };
+  status: OrderStatus;
+  totalAmount: number;
+  _id: string;
+  id: string;
+}
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];

@@ -1,34 +1,30 @@
-import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  Container,
-  Row,
-  Spinner,
-} from "react-bootstrap";
-import {
-  capitaliseFirstAlphabet,
-  getStatusColor,
-  getStatusLabel,
-  toast,
-} from "../utils/helper";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import axios from "../axios";
-import { isBefore } from "date-fns/fp";
-import { format } from "date-fns";
-import { IoReload } from "react-icons/io5";
-import OrderStepper from "../components/layout/OrderStepper";
-import useCart from "../hooks/useCart";
+import { useQuery } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import { format } from 'date-fns';
+import { isBefore } from 'date-fns/fp';
+import { useState } from 'react';
+import { Badge, Button, Card, Col, Container, Row, Spinner } from 'react-bootstrap';
+import { IoReload } from 'react-icons/io5';
+import type { ApiError, Order, OrderItem } from 'type';
+
+import axios from '../axios';
+import OrderStepper from '../components/layout/OrderStepper';
+import useCart from '../hooks/useCart';
+import { getStatusColor, getStatusLabel, toast } from '../utils/helper';
+
+interface UserOrderResponse {
+  data: Order[];
+  status: string;
+}
 
 const UserOrders = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { addToCart } = useCart();
 
-  const fetchOrders = async () => {
-    const res = await axios("/user-orders");
+  const fetchOrders = async (): Promise<Order[]> => {
+    const res = await axios.get<UserOrderResponse>('/user-orders');
+    console.log(res, 'resposne ka data');
     return res.data.data;
   };
 
@@ -36,33 +32,45 @@ const UserOrders = () => {
     data: orders = [],
     isLoading: isOrderLoading,
     refetch: refetchOrders,
-  } = useQuery({ queryKey: ["fetch-orders"], queryFn: fetchOrders });
+  } = useQuery({ queryKey: ['fetch-orders'], queryFn: fetchOrders });
 
-  const handleCancelOrder = async (order_id) => {
+  const handleCancelOrder = async (order_id: string) => {
     setIsLoading(true);
     try {
       await axios.patch(`/user-orders/${order_id}`, {
-        status: "cancelled",
+        status: 'cancelled',
       });
-      toast("Order cancelled successfully");
-      refetchOrders();
-    } catch (err) {
-      toast(err.response?.data?.message || "Something went wrong");
+      toast('Order cancelled successfully');
+      void refetchOrders();
+    } catch (err: unknown) {
+      let message = 'Something went wrong';
+
+      if (isAxiosError<ApiError>(err)) {
+        message = err.response?.data?.message ?? message;
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+
+      toast(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleReOrder = (orderItems) => {
+  const handleReOrder = (orderItems: OrderItem[]) => {
     orderItems.forEach((item) => {
-      addToCart(item.product._id, item.variantId, item.quantity);
+      void addToCart({
+        productId: item.product._id,
+        variantId: item.variantId,
+        quantity: item.quantity,
+      });
     });
   };
 
-  const isOrderDisabled = (order) => {
+  const isOrderDisabled = (order: Order) => {
     return (
-      isBefore(new Date(order.updated_at), new Date()) ||
-      ["converted", "cancelled"].includes(order.status)
+      isBefore(new Date(order.createdAt), new Date()) ||
+      ['converted', 'cancelled'].includes(order.status)
     );
   };
 
@@ -79,9 +87,7 @@ const UserOrders = () => {
       {orders.length > 0 ? (
         orders.map((order) => (
           <Card
-            className={`shadow-sm p-4 mb-5 rounded-4 ${
-              isOrderDisabled(order) ? "opacity-75" : ""
-            }`}
+            className={`shadow-sm p-4 mb-5 rounded-4 ${isOrderDisabled(order) ? 'opacity-75' : ''}`}
             key={order.id}
           >
             <Row className="mb-3 align-items-center">
@@ -93,19 +99,14 @@ const UserOrders = () => {
                 </h5>
               </Col>
               <Col className="text-end text-muted">
-                <small>
-                  {format(new Date(order.createdAt), "dd MMM yyyy")}
-                </small>
+                <small>{format(new Date(order.createdAt), 'dd MMM yyyy')}</small>
               </Col>
             </Row>
 
             <hr />
 
             {order?.orderItems?.map((item) => (
-              <Row
-                key={item.id}
-                className="align-items-center mb-3 pb-3 border-bottom"
-              >
+              <Row key={item.id} className="align-items-center mb-3 pb-3 border-bottom">
                 <Col md={2} xs={4} className="text-center">
                   <img
                     src={item.product.image}
@@ -126,11 +127,7 @@ const UserOrders = () => {
                   )}
                 </Col>
 
-                <Col
-                  md={4}
-                  xs={12}
-                  className="text-md-end text-start mt-3 mt-md-0"
-                >
+                <Col md={4} xs={12} className="text-md-end text-start mt-3 mt-md-0">
                   <Badge bg="info" className="me-2">
                     Qty: {item.quantity}
                   </Badge>
@@ -145,7 +142,6 @@ const UserOrders = () => {
               </Col>
 
               <Col className="text-end">
-                {console.log(order, "orders hi to hi")}
                 <Button
                   variant="outline-success"
                   className="me-2"
@@ -159,15 +155,15 @@ const UserOrders = () => {
                     onClick={() => handleCancelOrder(order._id)}
                     disabled={isLoading}
                   >
-                    {isLoading ? "Cancelling..." : "Cancel Order"}
+                    {isLoading ? 'Cancelling...' : 'Cancel Order'}
                   </Button>
                 )}
               </Col>
             </Row>
             <OrderStepper
               status={order.status}
-              orderId={order.id}
-              orderDate={format(new Date(order.createdAt), "dd MMM yyyy")}
+              // orderId={order.id}
+              // orderDate={format(new Date(order.createdAt), 'dd MMM yyyy')}
             />
           </Card>
         ))

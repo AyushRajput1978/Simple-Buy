@@ -1,54 +1,77 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
+import { useMutation } from '@tanstack/react-query';
+import Cookies from 'js-cookie';
+import { useState } from 'react';
+import { Col, Container, Row } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import type { User } from 'type';
 
-import axios from "../axios";
-import { setAuth } from "../redux/reducer/authSlice";
-import { Col, Container, Row } from "react-bootstrap";
+import axios from '../axios';
+import { setAuth } from '../redux/reducer/authSlice';
+
+interface PasswordResetResponse {
+  user: User;
+  token: string;
+}
+
+interface ApiResponse {
+  data: PasswordResetResponse;
+  status?: number;
+  statusText?: string;
+}
+interface FormState {
+  password: string;
+  newPassword: string;
+  newPasswordConfirm: string;
+}
 
 const ResetPassword = () => {
-  const [form, setForm] = useState({
-    password: "",
-    newPassword: "",
-    newPasswordConfirm: "",
+  const [form, setForm] = useState<FormState>({
+    password: '',
+    newPassword: '',
+    newPasswordConfirm: '',
   });
-  const { token } = useParams();
+  const { token: urlToken } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const resetPasswordHandler = useMutation({
+  const resetPasswordHandler = useMutation<ApiResponse, Error, FormState>({
     mutationFn: async (formData) => {
-      if (token)
-        return axios.post(`/user/reset-password/${token}`, {
+      if (urlToken) {
+        const response = await axios.post(`/user/reset-password/${urlToken}`, {
           newPassword: formData.newPassword,
           newPasswordConfirm: formData.newPasswordConfirm,
         });
-      else return axios.patch("/user/update-password", formData);
+        return response;
+      } else {
+        const response = await axios.patch('/user/update-password', formData);
+        return response;
+      }
     },
     onSuccess: (res) => {
-      const { user, token } = res.data.data;
-      Cookies.set("JWT", token, {
+      // Now TypeScript knows the shape of res.data
+      const { user, token } = res.data;
+
+      Cookies.set('JWT', token, {
         expires: 2,
         secure: true,
-        sameSite: "Strict",
+        sameSite: 'Strict',
       });
 
       dispatch(setAuth({ user }));
 
-      if (user.role === "admin" || user.role === "superAdmin") {
-        navigate("/dashboard");
+      if (user.role === 'admin' || user.role === 'superAdmin') {
+        navigate('/dashboard');
       } else {
-        navigate("/");
+        navigate('/');
       }
     },
     onError: (err) => {
-      console.error("Login error", err);
+      console.error('Login error', err);
     },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     resetPasswordHandler.mutate(form);
   };
@@ -59,7 +82,7 @@ const ResetPassword = () => {
       <Row className="my-4 h-100">
         <Col md={4} sm={8} className="mx-auto">
           <form onSubmit={handleSubmit}>
-            {!token && (
+            {!urlToken && (
               <div className="my-3">
                 <label htmlFor="email">Password</label>
                 <input
@@ -68,9 +91,7 @@ const ResetPassword = () => {
                   id="password"
                   placeholder="Password"
                   value={form.password}
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
                 />
               </div>
             )}
@@ -82,9 +103,7 @@ const ResetPassword = () => {
                 id="new-password"
                 placeholder="New Password"
                 value={form.newPassword}
-                onChange={(e) =>
-                  setForm({ ...form, newPassword: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, newPassword: e.target.value })}
               />
             </div>
             <div className="my-3">
@@ -95,18 +114,16 @@ const ResetPassword = () => {
                 id="confirm-new-password"
                 placeholder="New Password Confirm"
                 value={form.newPasswordConfirm}
-                onChange={(e) =>
-                  setForm({ ...form, newPasswordConfirm: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, newPasswordConfirm: e.target.value })}
               />
             </div>
             <div className="text-center">
               <button
                 className="my-2 mx-auto btn btn-dark"
                 type="submit"
-                disabled={resetPasswordHandler.isLoading}
+                disabled={resetPasswordHandler.isPending}
               >
-                {resetPasswordHandler.isLoading ? "Submitting..." : "Submit"}
+                {resetPasswordHandler.isPending ? 'Submitting...' : 'Submit'}
               </button>
             </div>
           </form>
