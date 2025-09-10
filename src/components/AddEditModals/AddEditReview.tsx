@@ -1,25 +1,51 @@
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FaImages } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import { BsChatQuote } from 'react-icons/bs';
+import { FaImages } from 'react-icons/fa';
+import type { Review } from 'type';
 
-import MultImageUploader from '../layout/MultiImageUploader';
-import StarRatingInput from '../layout/StarRatingsInput';
 import axios from '../../axios';
 import { handleChange, toast } from '../../utils/helper';
+import MultImageUploader from '../layout/MultiImageUploader';
+import StarRatingInput from '../layout/StarRatingsInput';
 
-const AddEditReview = ({ productId, show, onClose, initialData = null, onUpdated }) => {
-  const initialFormState = {
+interface AddEditReviewProps {
+  productId: string;
+  show: boolean;
+  onClose: () => void;
+  initialData: Review | null;
+  onUpdated: () => void;
+}
+interface ApiResponse {
+  data: Review;
+  status?: number;
+  statusText?: string;
+}
+type ReviewFormState = {
+  product: string;
+  rating: number;
+  comment: string;
+  images: (File | string)[];
+};
+
+const AddEditReview = ({
+  productId,
+  show,
+  onClose,
+  initialData = null,
+  onUpdated,
+}: AddEditReviewProps) => {
+  const initialFormState: ReviewFormState = {
+    images: [''],
     product: productId,
-    rating: null,
+    rating: 0,
     comment: '',
   };
   const queryClient = useQueryClient();
 
-  const [galleryImages, setGalleryImages] = useState([]);
-  const [formData, setFormData] = useState(initialFormState);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [formData, setFormData] = useState<ReviewFormState>(initialFormState);
 
   useEffect(() => {
     if (initialData) {
@@ -32,7 +58,7 @@ const AddEditReview = ({ productId, show, onClose, initialData = null, onUpdated
     setFormData((prev) => ({ ...prev, images: [...galleryImages] }));
   }, [galleryImages]);
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending } = useMutation<ApiResponse, Error, FormData>({
     mutationFn: async (data) => {
       const url = initialData ? `/reviews/${initialData.id}` : '/reviews';
       const method = initialData ? 'PATCH' : 'POST';
@@ -44,8 +70,8 @@ const AddEditReview = ({ productId, show, onClose, initialData = null, onUpdated
         headers: { 'Content-Type': 'multipart/form-data' },
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['add-edit-reviews']);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['add-edit-reviews'] });
       onUpdated();
       handleCloseAndReset();
     },
@@ -54,26 +80,31 @@ const AddEditReview = ({ productId, show, onClose, initialData = null, onUpdated
     },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
+
     if (!formData.rating || formData.rating < 1) {
       toast('Please select a rating before submitting your review.', false);
       return;
     }
-
     if (!formData.comment || formData.comment.trim().length === 0) {
       toast('Please write a comment before submitting your review.', false);
       return;
     }
-    const form = new FormData();
 
-    for (const key in formData) {
-      if (key === 'images') {
-        formData.images.forEach((file) => {
-          form.append('images', file);
-        });
+    const form = new FormData();
+    // Append fields explicitly (avoid for..in with string indexing)
+    form.append('product', formData.product);
+    form.append('rating', String(formData.rating));
+    form.append('comment', formData.comment);
+
+    for (const item of formData.images) {
+      // FormData.append accepts string | Blob; File extends Blob
+      if (item instanceof Blob) {
+        form.append('images', item);
       } else {
-        form.append(key, formData[key]);
+        // If your backend expects files only, convert data URLs/URLs to Blob before appending.
+        form.append('images', item);
       }
     }
 
@@ -110,7 +141,7 @@ const AddEditReview = ({ productId, show, onClose, initialData = null, onUpdated
               <Form.Label className="fw-semibold">Rating</Form.Label>
               <StarRatingInput
                 rating={formData.rating || 0}
-                setRating={(val) => setFormData((prev) => ({ ...prev, rating: val }))}
+                setRating={(val: number) => setFormData((prev) => ({ ...prev, rating: val }))}
                 disabled={isPending}
               />
             </Col>
@@ -124,7 +155,7 @@ const AddEditReview = ({ productId, show, onClose, initialData = null, onUpdated
                 </Form.Label>
                 <Form.Control
                   as="textarea"
-                  rows="3"
+                  rows={3}
                   name="comment"
                   placeholder="Write your thoughts about this product..."
                   value={formData.comment}
@@ -147,12 +178,6 @@ const AddEditReview = ({ productId, show, onClose, initialData = null, onUpdated
       </Form>
     </Modal>
   );
-};
-
-AddEditReview.propTypes = {
-  show: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  initialData: PropTypes.object,
 };
 
 export default AddEditReview;

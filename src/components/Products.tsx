@@ -7,16 +7,12 @@ import axios from '../axios';
 import useCart from '../hooks/useCart';
 import { ProductsLoadingShimmer } from './layout/LoadingShimmers';
 import ProductCard from './layout/ProductCard';
-import type { Category, ProductType } from '../../type';
-
-interface ProductResponse {
-  status: string;
-  data: ProductType[];
-}
-interface ProductCategoriesResponse {
-  status: string;
-  data: Category[];
-}
+import type {
+  ProductCategoriesResponse,
+  ProductCategoryType,
+  ProductResponse,
+  ProductType,
+} from '../../type';
 
 const Products = () => {
   const [filter, setFilter] = useState<ProductType[]>([]);
@@ -26,11 +22,11 @@ const Products = () => {
     void addToCart({ productId: product.id, variantId: variantId, quantity: 1 });
   };
 
-  const fetchProductCategories = async (): Promise<Category[]> => {
+  const fetchProductCategories = async (): Promise<ProductCategoryType[]> => {
     const res = await axios.get<ProductCategoriesResponse>('/product-categories');
     return res.data.data;
   };
-  const { data: productCategories = [] } = useQuery<Category[]>({
+  const { data: productCategories = [] } = useQuery<ProductCategoryType[]>({
     queryKey: ['product-categories'],
     queryFn: fetchProductCategories,
   });

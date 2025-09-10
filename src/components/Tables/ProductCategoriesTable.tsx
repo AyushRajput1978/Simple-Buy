@@ -1,57 +1,68 @@
-import { Table, Spinner, Dropdown, Card, ButtonGroup } from "react-bootstrap";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { BsThreeDots } from "react-icons/bs";
+import { useQuery } from '@tanstack/react-query';
+import type { AxiosError } from 'axios';
+import { useState } from 'react';
+import { Table, Dropdown, Card, ButtonGroup, Row } from 'react-bootstrap';
+import { BsThreeDots } from 'react-icons/bs';
+import { FaEdit } from 'react-icons/fa';
+import { MdDelete } from 'react-icons/md';
+import type { ApiError, ProductCategoriesResponse, ProductCategoryType } from 'type';
 
-import axios from "../../axios";
-import AddEditProductCategoriesModal from "../AddEditModals/AddEditProductCategoriesModal";
-import { TableLoadingShimmer } from "../layout/LoadingShimmers";
-import ConfirmModal from "../layout/AlertModal";
+import axios from '../../axios';
+import { toast } from '../../utils/helper';
+import AddEditProductCategoriesModal from '../AddEditModals/AddEditProductCategoriesModal';
+import ConfirmModal from '../layout/AlertModal';
+import { TableLoadingShimmer } from '../layout/LoadingShimmers';
+
+interface ProductCategoryResponse {
+  status: string;
+  data: ProductCategoryType;
+}
 
 const ProductCategoriesTable = () => {
   const [showModal, setShowModal] = useState(false);
-  const [initialData, setInitialData] = useState([]);
+  const [initialData, setInitialData] = useState<ProductCategoryType | null>(null);
   const [loading, setLoading] = useState(false);
-  const [prodCatId, setProdCatId] = useState(null);
+  const [prodCatId, setProdCatId] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const fetchProductCategories = async () => {
-    const res = await axios.get("/dashboard/product-categories");
+  const fetchProductCategories = async (): Promise<ProductCategoryType[]> => {
+    const res = await axios.get<ProductCategoriesResponse>('/dashboard/product-categories');
     return res.data.data;
   };
   const {
-    data,
+    data: productCategories = [],
     isLoading,
     refetch: refetchProductCategories,
   } = useQuery({
-    queryKey: ["product-categories"],
+    queryKey: ['product-categories'],
     queryFn: fetchProductCategories,
   });
 
-  const handleEdit = async (id) => {
-    const res = await axios.get(`/dashboard/product-categories/${id}`);
+  const handleEdit = async (id: string) => {
+    const res = await axios.get<ProductCategoryResponse>(`/dashboard/product-categories/${id}`);
     setInitialData(res.data.data);
     setShowModal(true);
   };
 
-  const deleteProdCat = async (id) => {
+  const deleteProdCat = async (id: string) => {
     setLoading(true);
     try {
       await axios.delete(`/dashboard/product-categories/${id}`);
-      toast("Product category deleted successfully");
-      refetchProductCategories();
+      toast('Product category deleted successfully');
+      void refetchProductCategories();
     } catch (err) {
-      toast(err.response.data.message || "Something went wrong", false);
+      const error = err as AxiosError<ApiError>;
+      toast(error.response?.data?.message || 'Something went wrong', false);
     } finally {
       setLoading(false);
     }
   };
-  const handleConfirmDeleteProdCat = () => {
-    deleteProdCat(prodCatId);
-    setShowConfirmModal(false);
-    setProdCatId(null);
+  const handleConfirmDeleteProdCat = async () => {
+    if (prodCatId) {
+      await deleteProdCat(prodCatId);
+      setShowConfirmModal(false);
+      setProdCatId(null);
+    }
   };
 
   if (isLoading || loading) {
@@ -60,7 +71,7 @@ const ProductCategoriesTable = () => {
   return (
     <Card border="light" className="table-wrapper table-responsive shadow-sm">
       <Card.Body className="p-0 pb-4 justify-content-center">
-        {data.length > 0 ? (
+        {productCategories.length > 0 ? (
           <Table hover className="user-table min-height">
             <thead>
               <tr>
@@ -71,7 +82,7 @@ const ProductCategoriesTable = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((cat, index) => (
+              {productCategories.map((cat, index) => (
                 <tr key={cat._id}>
                   <td text-label="SNo.">
                     <span className="fw-normal">{index + 1}</span>
@@ -93,7 +104,7 @@ const ProductCategoriesTable = () => {
                       <Dropdown.Menu>
                         <Dropdown.Item
                           onClick={() => {
-                            handleEdit(cat._id);
+                            void handleEdit(cat._id);
                           }}
                           className="d-flex align-items-center gap-1"
                         >
@@ -103,7 +114,7 @@ const ProductCategoriesTable = () => {
                           className="text-danger d-flex align-items-center gap-1"
                           onClick={() => {
                             setShowConfirmModal(true);
-                            setOrderId(cat._id);
+                            setProdCatId(cat._id);
                           }}
                         >
                           <MdDelete />
@@ -118,7 +129,7 @@ const ProductCategoriesTable = () => {
           </Table>
         ) : (
           <Row className="justify-content-center align-item-center text-dark fontweigh-500 p-4">
-            {" "}
+            {' '}
             No Data Available.....
           </Row>
         )}
@@ -139,7 +150,7 @@ const ProductCategoriesTable = () => {
         show={showModal}
         onClose={() => {
           setShowModal(false);
-          setEditId(null);
+          setInitialData(null);
         }}
         initialData={initialData}
       />

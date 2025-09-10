@@ -32,7 +32,6 @@ const DashboardHome = () => {
     queryKey: ['dashboard-stats'],
     queryFn: fetchAllStats,
   });
-  console.log(stats, 'stats hai na');
   const StatCard = ({ title, icon, bgColor, value }: StatsCardProps) => (
     <Col lg={3} md={4} sm={6} key={title}>
       <Card className="p-3 shadow-sm border-0 rounded-4">

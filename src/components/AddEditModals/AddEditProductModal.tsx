@@ -1,44 +1,48 @@
-import {
-  Modal,
-  Button,
-  Form,
-  Row,
-  Col,
-  OverlayTrigger,
-  FormLabel,
-  Tooltip,
-} from "react-bootstrap";
-import { FaInfoCircle, FaTrash } from "react-icons/fa";
-import { useEffect, useState } from "react";
-import Select from "react-select";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import PropTypes from "prop-types";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { Modal, Button, Form, Row, Col, OverlayTrigger, FormLabel, Tooltip } from 'react-bootstrap';
+import { FaInfoCircle, FaTrash } from 'react-icons/fa';
+import Select from 'react-select';
+import type { ProductResponse, ProductType, Variant } from 'type';
 
-import ImageUploader from "../layout/ImageUploader";
-import axios from "../../axios";
-import { handleChange } from "../../utils/helper";
+import axios from '../../axios';
+import { handleChange, toast } from '../../utils/helper';
+import ImageUploader from '../layout/ImageUploader';
 
-const initialFormState = {
-  // image: "",
-  name: "",
-  price: null,
-  priceDiscount: null,
-  brand: "",
-  countInStock: null,
-  category: "",
-  description: "",
-  variants: [
-    {
-      attributeName: "",
-      attributeValue: "",
-      regularPrice: 0,
-      countInStock: 0,
-    },
-  ],
+interface AddEditProductModalProps {
+  show: boolean;
+  onClose: () => void;
+  initialData: ProductType | null;
+}
+interface ApiResponse {
+  data: ProductType;
+  status?: number;
+  statusText?: string;
+}
+interface FormState {
+  image: string;
+  name: string;
+  price: number;
+  priceDiscount: number;
+  brand: string;
+  category: { label: string; value: string };
+  description: string;
+  variants: Variant[];
+}
+type SimpleField = 'name' | 'price' | 'priceDiscount' | 'brand';
+const initialFormState: FormState = {
+  image: '',
+  name: '',
+  price: 0,
+  priceDiscount: 0,
+  brand: '',
+  category: { label: '', value: '' },
+  description: '',
+  variants: [{ id: '', attributeName: '', attributeValue: '', regularPrice: 0, countInStock: 0 }],
 };
-const AddEditProductModal = ({ show, onClose, initialData = null }) => {
-  const [image, setImage] = useState("");
-  const [formData, setFormData] = useState(initialFormState);
+const AddEditProductModal = ({ show, onClose, initialData = null }: AddEditProductModalProps) => {
+  const [image, setImage] = useState('');
+  const [formData, setFormData] = useState<FormState>(initialFormState);
 
   const queryClient = useQueryClient();
 
@@ -56,16 +60,16 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
   }, [initialData]);
 
   useEffect(() => {
-    setFormData({ ...formData, image });
+    setFormData((prevData) => ({ ...prevData, image }));
   }, [image]);
 
-  const fetchProductCategories = async () => {
-    const res = await axios.get("/dashboard/product-categories");
+  const fetchProductCategories = async (): Promise<ProductType[]> => {
+    const res = await axios.get<ProductResponse>('/dashboard/product-categories');
     return res.data.data;
   };
 
   const { data: productCategories = [] } = useQuery({
-    queryKey: ["product-categories"],
+    queryKey: ['product-categories'],
     queryFn: fetchProductCategories,
   });
   const productCategoriesOptions = productCategories.map((prodCat) => ({
@@ -73,55 +77,50 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
     value: prodCat._id,
   }));
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending } = useMutation<ApiResponse, Error, FormData>({
     mutationFn: async (data) => {
-      const method = initialData ? "PATCH" : "POST";
-      const url = initialData
-        ? `/dashboard/products/${initialData._id}`
-        : "/dashboard/products";
+      const method = initialData ? 'PATCH' : 'POST';
+      const url = initialData ? `/dashboard/products/${initialData._id}` : '/dashboard/products';
       return await axios({
         method,
         url,
         data,
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["add-edit-products"]);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['add-edit-products'] });
+      toast(`Product ${initialData ? 'updated' : 'added'} successfully`);
       handleCloseAndClear();
     },
     onError: (error) => {
-      console.error("Failed to submit:", error);
+      console.error('Failed to submit:', error);
     },
   });
-  const handleAttributeChange = (index, key, newValue) => {
-    setFormData((prevForm) => {
-      const updatedVariants = [...prevForm.variants];
-      updatedVariants[index][key] = newValue;
-
-      return {
-        ...prevForm,
-        variants: updatedVariants,
-      };
+  const handleAttributeChange = <K extends keyof Variant>(
+    index: number,
+    key: K,
+    newValue: Variant[K],
+  ) => {
+    setFormData((prev) => {
+      const variants = prev.variants.slice();
+      variants[index] = { ...variants[index], [key]: newValue } as Variant;
+      return { ...prev, variants };
     });
   };
+
   const handleAddAttribute = () => {
     setFormData((prevForm) => ({
       ...prevForm,
       variants: [
         ...prevForm.variants,
-        {
-          attributeName: "",
-          attributeValue: "",
-          regularPrice: 0,
-          countInStock: 0,
-        },
+        { id: '', attributeName: '', attributeValue: '', regularPrice: 0, countInStock: 0 },
       ],
     }));
   };
-  const handleRemoveAttribute = (index) => {
+  const handleRemoveAttribute = (index: number) => {
     setFormData((prevForm) => {
       const updatedVariants = [...prevForm.variants];
       updatedVariants.splice(index, 1);
@@ -129,34 +128,50 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
     const form = new FormData();
-    for (const key in formData) {
-      const value = formData[key];
-      if (key === "category" && value?.value) {
-        form.append("productCategoryId", value.value);
-      } else if (key === "variants") {
-        formData.variants.forEach((varnt) => {
-          form.append("variants", JSON.stringify(varnt));
-        });
-      } else {
-        form.append(key, value);
-      }
-    }
+    form.append('productCategoryId', formData.category.value);
+    form.append('image', formData.image);
+    form.append('name', formData.name);
+    form.append('price', String(formData.price));
+    form.append('priceDiscount', String(formData.priceDiscount));
+    form.append('brand', formData.brand);
+    form.append('description', formData.description);
+    formData.variants.forEach((v) => form.append('variants', JSON.stringify(v)));
     mutate(form);
   };
 
   const handleCloseAndClear = () => {
     onClose();
     setFormData(initialFormState);
-    setImage("");
+    setImage('');
   };
+
+  const simpleFields: Array<{
+    label: string;
+    name: SimpleField;
+    type: 'text' | 'number';
+    placeholder: string;
+    required?: boolean;
+  }> = [
+    {
+      label: "Product's Name",
+      name: 'name',
+      type: 'text',
+      placeholder: 'eg: Roadster half sleeve t-shirt',
+      required: true,
+    },
+    { label: 'Price', name: 'price', type: 'number', placeholder: 'eg: 199', required: true },
+    { label: 'Price Discount', name: 'priceDiscount', type: 'number', placeholder: 'eg: 10' },
+    { label: 'Brand', name: 'brand', type: 'text', placeholder: 'Roadster' },
+  ];
+
   return (
     <Modal show={show} onHide={handleCloseAndClear} centered size="xl">
       <Form onSubmit={handleSubmit}>
         <Modal.Header closeButton>
-          <Modal.Title>{initialData ? "Edit" : "Add"} Product</Modal.Title>
+          <Modal.Title>{initialData ? 'Edit' : 'Add'} Product</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -171,45 +186,18 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
             </Col>
           </Row>
           <Row>
-            {[
-              {
-                label: "Product's Name",
-                name: "name",
-                type: "text",
-                placeholder: "eg: Roadster half sleeve t-shirt",
-                required: true,
-              },
-              {
-                label: "Price",
-                name: "price",
-                type: "number",
-                placeholder: "eg: 199",
-                required: true,
-              },
-              {
-                label: "Price Discount",
-                name: "priceDiscount",
-                type: "number",
-                placeholder: "eg: 10",
-              },
-              {
-                label: "Brand",
-                name: "brand",
-                type: "text",
-                placeholder: "Roadster",
-              },
-            ].map(({ name, label, type, placeholder }) => (
-              <Col lg={3} md={4} key={name}>
+            {simpleFields.map((field) => (
+              <Col lg={3} md={4} key={field.name}>
                 <Form.Group className="mb-3">
-                  <Form.Label>{label}</Form.Label>
+                  <Form.Label>{field.label}</Form.Label>
                   <Form.Control
-                    type={type}
-                    name={name}
-                    value={formData[name]}
-                    placeholder={placeholder}
+                    type={field.type}
+                    name={field.name}
+                    value={formData[field.name]}
+                    placeholder={field.placeholder}
                     onChange={(e) => handleChange(e, setFormData)}
                     disabled={isPending}
-                    required={name === "name" || name === "price"}
+                    required={field.required}
                   />
                 </Form.Group>
               </Col>
@@ -222,8 +210,11 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                   placeholder="Please select the category"
                   value={formData.category}
                   options={productCategoriesOptions}
-                  onChange={(data) =>
-                    setFormData({ ...formData, category: data })
+                  onChange={(opt) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      category: opt ?? prev.category, // ← never set null
+                    }))
                   }
                   isDisabled={isPending}
                 />
@@ -234,7 +225,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                 <Form.Label>Description</Form.Label>
                 <Form.Control
                   as="textarea"
-                  rows="3"
+                  rows={3}
                   name="description"
                   placeholder="Enter Description"
                   value={formData.description}
@@ -264,13 +255,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                     type="text"
                     placeholder="Enter attribute name (e.g: cm, inch, cloth size: S, M, L)"
                     value={varnt.attributeName}
-                    onChange={(e) =>
-                      handleAttributeChange(
-                        index,
-                        "attributeName",
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => handleAttributeChange(index, 'attributeName', e.target.value)}
                   />
                 </Form.Group>
                 {/* {error[`variant_attribute_name_${index}`] && (
@@ -282,20 +267,12 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
 
               <Col md={4} lg={3} xl={2}>
                 <Form.Group controlId={`attributeValue${index}`}>
-                  <Form.Label className="fontweigh-500">
-                    Attribute Value
-                  </Form.Label>
+                  <Form.Label className="fontweigh-500">Attribute Value</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter attribute value"
                     value={varnt.attributeValue}
-                    onChange={(e) =>
-                      handleAttributeChange(
-                        index,
-                        "attributeValue",
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => handleAttributeChange(index, 'attributeValue', e.target.value)}
                   />
                 </Form.Group>
                 {/* {error[`variant_attribute_value_${index}`] && (
@@ -306,19 +283,13 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
               </Col>
               <Col md={4} xl={2} lg={3}>
                 <Form.Group controlId={`regularPrice${index}`}>
-                  <Form.Label className="fontweigh-500">
-                    Regular Price
-                  </Form.Label>
+                  <Form.Label className="fontweigh-500">Regular Price</Form.Label>
                   <Form.Control
                     type="number"
                     placeholder="Enter Regular Price"
                     value={varnt.regularPrice}
                     onChange={(e) =>
-                      handleAttributeChange(
-                        index,
-                        "regularPrice",
-                        e.target.value
-                      )
+                      handleAttributeChange(index, 'regularPrice', Number(e.target.value))
                     }
                   />
                 </Form.Group>
@@ -337,11 +308,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                     placeholder="Enter stock quantity"
                     value={varnt.countInStock}
                     onChange={(e) =>
-                      handleAttributeChange(
-                        index,
-                        "countInStock",
-                        e.target.value
-                      )
+                      handleAttributeChange(index, 'countInStock', Number(e.target.value))
                     }
                   />
                 </Form.Group>
@@ -356,14 +323,11 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
                   <FaTrash
                     className="mr-4 text-danger"
                     onClick={() => handleRemoveAttribute(index)}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: 'pointer' }}
                   />
                 )}
                 {index === formData.variants.length - 1 && (
-                  <Button
-                    variant="outline-primary"
-                    onClick={handleAddAttribute}
-                  >
+                  <Button variant="outline-primary" onClick={handleAddAttribute}>
                     Add More
                   </Button>
                 )}
@@ -373,26 +337,16 @@ const AddEditProductModal = ({ show, onClose, initialData = null }) => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button
-            variant="light"
-            disabled={isPending}
-            onClick={handleCloseAndClear}
-          >
+          <Button variant="light" disabled={isPending} onClick={handleCloseAndClear}>
             Cancel
           </Button>
           <Button variant="dark" type="submit" disabled={isPending}>
-            {isPending ? "Saving..." : initialData ? "Update" : "Add"}
+            {isPending ? 'Saving...' : initialData ? 'Update' : 'Add'}
           </Button>
         </Modal.Footer>
       </Form>
     </Modal>
   );
-};
-
-AddEditProductModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  initialData: PropTypes.object,
 };
 
 export default AddEditProductModal;

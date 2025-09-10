@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   Button,
   Col,
@@ -12,9 +13,16 @@ import {
   ModalTitle,
   Row,
 } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
+import type { Address } from 'type';
 
 import { handleChange } from '../../utils/helper';
+
+interface AddEditAddressProps {
+  show: boolean;
+  handleClose: () => void;
+  initialData: Address | null;
+  setAddresses: React.Dispatch<React.SetStateAction<Address[]>>;
+}
 
 const initialFormState = {
   addressLine: '',
@@ -23,9 +31,10 @@ const initialFormState = {
   country: '',
   postalCode: '',
   isDefault: false,
+  _id: '',
 };
 
-const AddEditAddress = ({ show, handleClose, initialData, setAddresses }) => {
+const AddEditAddress = ({ show, handleClose, initialData, setAddresses }: AddEditAddressProps) => {
   const [form, setForm] = useState(initialFormState);
 
   useEffect(() => {
@@ -76,7 +85,45 @@ const AddEditAddress = ({ show, handleClose, initialData, setAddresses }) => {
 
     handleCloseAndClear();
   };
-
+  const AddressFormStates = [
+    {
+      name: 'addressLine',
+      label: 'House Number & Street',
+      placeholder: 'Street',
+      required: true,
+    },
+    {
+      name: 'city',
+      label: 'City',
+      placeholder: 'City',
+      required: true,
+    },
+    {
+      name: 'state',
+      label: 'State',
+      placeholder: 'State',
+      required: true,
+    },
+    {
+      name: 'country',
+      label: 'Country',
+      placeholder: 'Country',
+      required: true,
+    },
+    {
+      name: 'postalCode',
+      label: 'Postal Code',
+      placeholder: 'Postal Code',
+      required: true,
+      type: 'number',
+    },
+  ] satisfies ReadonlyArray<{
+    name: keyof Address;
+    label: string;
+    placeholder: string;
+    required: boolean;
+    type?: string;
+  }>;
   return (
     <Modal show={show} onHide={handleCloseAndClear} centered>
       <ModalHeader closeButton>
@@ -86,39 +133,7 @@ const AddEditAddress = ({ show, handleClose, initialData, setAddresses }) => {
       </ModalHeader>
       <ModalBody>
         <Row>
-          {[
-            {
-              name: 'addressLine',
-              label: 'House Number & Street',
-              placeholder: 'Street',
-              required: true,
-            },
-            {
-              name: 'city',
-              label: 'City',
-              placeholder: 'City',
-              required: true,
-            },
-            {
-              name: 'state',
-              label: 'State',
-              placeholder: 'State',
-              required: true,
-            },
-            {
-              name: 'country',
-              label: 'Country',
-              placeholder: 'Country',
-              required: true,
-            },
-            {
-              name: 'postalCode',
-              label: 'Postal Code',
-              placeholder: 'Postal Code',
-              required: true,
-              type: 'number',
-            },
-          ].map(({ name, label, placeholder, required, type = 'text' }) => (
+          {AddressFormStates.map(({ name, label, placeholder, required, type = 'text' }) => (
             <Col md={12} className="mb-2" key={name}>
               <FormGroup>
                 <FormLabel className="fw-semibold">

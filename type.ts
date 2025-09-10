@@ -7,9 +7,14 @@ export interface Variant {
   id: string;
   regularPrice: number;
 }
-export interface Category {
+export interface ProductCategoryType {
   _id: string;
   name: string;
+}
+
+export interface ProductCategoriesResponse {
+  status: string;
+  data: ProductCategoryType[];
 }
 export interface Review {
   comment: string;
@@ -22,7 +27,7 @@ export interface Review {
 }
 export interface ProductType {
   brand: string;
-  category: Category;
+  category: ProductCategoryType;
   description: string;
   id: string;
   _id: string;
@@ -34,6 +39,10 @@ export interface ProductType {
   ratingsQuantity: number;
   slug: string;
   variants: Variant[];
+}
+export interface ProductResponse {
+  status: string;
+  data: ProductType[];
 }
 
 export interface DetailedProduct extends ProductType {
@@ -101,7 +110,7 @@ export interface Address {
   isDefault: boolean;
   postalCode: string;
   state: string;
-  // _id: string;
+  _id: string;
 }
 export interface OrderItem {
   price: number;

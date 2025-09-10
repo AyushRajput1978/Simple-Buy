@@ -12,7 +12,7 @@ type PostalField = 'postalCode';
 
 // export const valuehandler = (arr, value) => arr?.find((opt) => opt.value === value);
 
-export function handleChange<T extends Record<string, unknown>>(
+export function handleChange<T extends Record<string>>(
   e: React.ChangeEvent<NamedEl>,
   setFormData: React.Dispatch<React.SetStateAction<T>>,
 ): void {
