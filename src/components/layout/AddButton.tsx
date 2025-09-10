@@ -6,7 +6,7 @@ interface AddButtonProps {
   icon: string;
   onClick: () => void;
   className: string;
-  disabled: boolean;
+  // disabled: boolean;
 }
 
 const AddButton = ({
@@ -14,14 +14,14 @@ const AddButton = ({
   icon = 'fa fa-plus',
   onClick,
   className = '',
-  disabled = false,
+  // disabled = false,
 }: AddButtonProps) => {
   return (
     <Button
       type="button"
       className={`btn-dark d-flex align-items-center gap-2 ${className}`}
       onClick={onClick}
-      disabled={disabled}
+      // disabled={disabled}
     >
       <i className={icon}></i>
       <span>{label}</span>

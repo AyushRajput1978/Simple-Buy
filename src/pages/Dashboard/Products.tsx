@@ -1,7 +1,8 @@
-import { useState } from "react";
-import AddButton from "../../components/layout/AddButton";
-import ProductsTable from "../../components/Tables/ProductsTable";
-import AddEditProductModal from "../../components/AddEditModals/AddEditProductModal";
+import { useState } from 'react';
+
+import AddEditProductModal from '../../components/AddEditModals/AddEditProductModal';
+import AddButton from '../../components/layout/AddButton';
+import ProductsTable from '../../components/Tables/ProductsTable';
 
 const DashboardProducts = () => {
   const [showModal, setShowModal] = useState(false);
@@ -20,10 +21,7 @@ const DashboardProducts = () => {
         />
       </div>
       <ProductsTable />
-      <AddEditProductModal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-      />
+      <AddEditProductModal show={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 };

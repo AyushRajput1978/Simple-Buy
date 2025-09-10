@@ -102,7 +102,7 @@ const Product = () => {
           <Col md={6} className="py-3">
             <small className="text-uppercase text-muted fs-5">{product?.category.name}</small>
             <h1 className="display-6">{product?.name}</h1>
-            <RatingStars ratings={product?.ratingsAverage} reviews={product?.reviews} />
+            <RatingStars ratings={product?.ratingsAverage} />
             <p className="fs-4 my-3">₹{selectedVariant.regularPrice}</p>
             <div className="d-flex gap-2 mb-2">
               <span className="my-auto">Size:</span>

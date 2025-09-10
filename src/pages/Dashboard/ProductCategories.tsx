@@ -1,7 +1,8 @@
-import { useState } from "react";
-import AddButton from "../../components/layout/AddButton";
-import ProductCategoriesTable from "../../components/Tables/ProductCategoriesTable";
-import AddEditProductCategoriesModal from "../../components/AddEditModals/AddEditProductCategoriesModal";
+import { useState } from 'react';
+
+import AddEditProductCategoriesModal from '../../components/AddEditModals/AddEditProductCategoriesModal';
+import AddButton from '../../components/layout/AddButton';
+import ProductCategoriesTable from '../../components/Tables/ProductCategoriesTable';
 
 const ProductCategories = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -20,10 +21,7 @@ const ProductCategories = () => {
         />
       </div>
       <ProductCategoriesTable />
-      <AddEditProductCategoriesModal
-        show={openModal}
-        onClose={() => setOpenModal(false)}
-      />
+      <AddEditProductCategoriesModal show={openModal} onClose={() => setOpenModal(false)} />
     </div>
   );
 };

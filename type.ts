@@ -121,5 +121,12 @@ export interface Order {
   _id: string;
   id: string;
 }
-
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export interface StatsType {
+  totalCustomers: number;
+  totalOrders: number;
+  totalProductCategories: number;
+  totalProducts: number;
+  totalRevenue: string;
+}
