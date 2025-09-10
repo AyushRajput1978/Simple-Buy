@@ -1,16 +1,21 @@
-import React from "react";
-import { FaStar } from "react-icons/fa";
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
+import { FaStar } from 'react-icons/fa';
 
-const StarRatingInput = ({ rating, setRating, disabled }) => {
+interface StarRatingInputProps {
+  rating: number;
+  setRating: (star: number) => void;
+  disabled: boolean;
+}
+
+const StarRatingInput = ({ rating, setRating, disabled }: StarRatingInputProps) => {
   return (
     <div className="d-flex gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
         <FaStar
           key={star}
           size={24}
-          style={{ cursor: disabled ? "default" : "pointer" }}
-          color={star <= rating ? "#ffc107" : "#e4e5e9"}
+          style={{ cursor: disabled ? 'default' : 'pointer' }}
+          color={star <= rating ? '#ffc107' : '#e4e5e9'}
           onClick={() => !disabled && setRating(star)}
         />
       ))}

@@ -1,29 +1,38 @@
 import { useState, useEffect } from 'react';
-import { useDropzone } from 'react-dropzone';
 import { Button, Image } from 'react-bootstrap';
+import { useDropzone } from 'react-dropzone';
 
-const ImageUploader = ({ img, setImg, size, isLoading }) => {
-  const [image, setImage] = useState(null);
+interface ImageUploaderProps {
+  img: string | File;
+  setImg: (img: File) => void;
+  size: string;
+  isLoading: boolean;
+}
+
+const ImageUploader = ({ img, setImg, size, isLoading }: ImageUploaderProps) => {
+  const [image, setImage] = useState<string | null>(null);
+
   useEffect(() => {
-    // Check if img is a File (binary)
+    let revokeUrl: string | null = null;
+
     if (img instanceof File) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        setImage(dataUrl);
-      };
-      reader.readAsDataURL(img);
+      const objectUrl = URL.createObjectURL(img);
+      setImage(objectUrl);
+      revokeUrl = objectUrl;
     } else {
-      // Assume img is a Data URL
-      setImage(img);
+      setImage(img || null);
     }
+
+    return () => {
+      if (revokeUrl) URL.revokeObjectURL(revokeUrl);
+    };
   }, [img]);
 
-  const onDrop = (acceptedFiles) => {
+  const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
 
     // Only proceed if the file is an image
-    if (!file.type.startsWith('image/')) {
+    if (!file?.type.startsWith('image/')) {
       alert('Only image files are allowed.');
       return;
     }
@@ -38,7 +47,7 @@ const ImageUploader = ({ img, setImg, size, isLoading }) => {
   };
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
+    accept: { 'image/*': [] },
     onDrop,
   });
   return (

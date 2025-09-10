@@ -20,7 +20,7 @@ interface ApiResponse {
   statusText?: string;
 }
 interface FormState {
-  image: string;
+  image: string | File;
   name: string;
   price: number;
   priceDiscount: number;
@@ -40,8 +40,9 @@ const initialFormState: FormState = {
   description: '',
   variants: [{ id: '', attributeName: '', attributeValue: '', regularPrice: 0, countInStock: 0 }],
 };
+
 const AddEditProductModal = ({ show, onClose, initialData = null }: AddEditProductModalProps) => {
-  const [image, setImage] = useState('');
+  const [image, setImage] = useState<string | File>('');
   const [formData, setFormData] = useState<FormState>(initialFormState);
 
   const queryClient = useQueryClient();
@@ -213,7 +214,7 @@ const AddEditProductModal = ({ show, onClose, initialData = null }: AddEditProdu
                   onChange={(opt) =>
                     setFormData((prev) => ({
                       ...prev,
-                      category: opt ?? prev.category, // ← never set null
+                      category: opt ?? prev.category,
                     }))
                   }
                   isDisabled={isPending}

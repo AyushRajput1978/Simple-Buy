@@ -24,7 +24,6 @@ const UserOrders = () => {
 
   const fetchOrders = async (): Promise<Order[]> => {
     const res = await axios.get<UserOrderResponse>('/user-orders');
-    console.log(res, 'resposne ka data');
     return res.data.data;
   };
 

@@ -1,12 +1,13 @@
-import { Toast, Col } from "react-bootstrap";
-import { FaBan, FaCheckCircle } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { Toast, Col } from 'react-bootstrap';
+import { FaBan, FaCheckCircle } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from 'type';
 
-import { hideToast } from "../../redux/reducer/toastSlice";
+import { hideToast } from '../../redux/reducer/toastSlice';
 
 const CustomToast = () => {
   const dispatch = useDispatch();
-  const { show, message, success } = useSelector((state) => state.toast);
+  const { show, message, success } = useSelector((state: RootState) => state.toast);
 
   return (
     <Toast
@@ -15,13 +16,13 @@ const CustomToast = () => {
       delay={5000}
       autohide
       style={{
-        position: "fixed",
+        position: 'fixed',
         top: 70,
         right: 40,
         zIndex: 1000000,
-        width: "auto",
-        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-        borderRadius: "10px",
+        width: 'auto',
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+        borderRadius: '10px',
       }}
     >
       <Toast.Header>
@@ -41,7 +42,7 @@ const CustomToast = () => {
         </Col>
       </Toast.Header>
       <Toast.Body className="d-flex align-items-center">
-        <span style={{ color: "black" }}>{message}</span>
+        <span style={{ color: 'black' }}>{message}</span>
       </Toast.Body>
     </Toast>
   );
