@@ -1,25 +1,32 @@
-import { useState } from "react";
-import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
-import { MdDelete } from "react-icons/md";
+import type { AxiosError } from "axios";
+import { useState } from "react";
+import { Table, Dropdown, Card, ButtonGroup, Image, Row } from "react-bootstrap";
 import { BsThreeDots } from "react-icons/bs";
+import { MdDelete } from "react-icons/md";
+import type { ApiError, User } from "type";
 
-import { TableLoadingShimmer } from "../layout/LoadingShimmers";
-import { toast } from "../../utils/helper";
 import axios from "../../axios";
+import { toast } from "../../utils/helper";
 import ConfirmModal from "../layout/AlertModal";
+import { TableLoadingShimmer } from "../layout/LoadingShimmers";
+
+interface UserResponse{
+  data:User[];
+  status:string
+}
 
 const UsersTable = () => {
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState("");
 
-  const fetchUsers = async () => {
-    const res = await axios.get("/dashboard/users");
+  const fetchUsers = async ():Promise<User[]> => {
+    const res = await axios.get<UserResponse>("/dashboard/users");
     return res.data.data;
   };
   const {
-    data,
+    data:users=[],
     isLoading,
     refetch: refetchProducts,
   } = useQuery({
@@ -27,22 +34,23 @@ const UsersTable = () => {
     queryFn: fetchUsers,
   });
 
-  const deleteUser = async (id) => {
+  const deleteUser = async (id:string) => {
     setLoading(true);
     try {
       await axios.delete(`/dashboard/users/${id}`);
       toast("User deleted successfully");
-      refetchProducts();
+      void refetchProducts();
     } catch (err) {
-      toast(err.response.data.message || "Something went wrong", false);
+      const error=err as AxiosError<ApiError>
+      toast(error.response?.data.message || "Something went wrong", false);
     } finally {
       setLoading(false);
     }
   };
   const handleConfirmDeleteUser = () => {
-    deleteUser(userId);
+   void deleteUser(userId);
     setShowConfirmModal(false);
-    setUserId(null);
+    setUserId("");
   };
   if (isLoading || loading) {
     return <TableLoadingShimmer />;
@@ -51,7 +59,7 @@ const UsersTable = () => {
   return (
     <Card border="light" className="shadow-sm">
       <Card.Body className="p-0 pb-4 justify-content-center">
-        {data.length > 0 ? (
+        {users.length > 0 ? (
           <div className="table-responsive">
             <Table
               hover
@@ -69,7 +77,7 @@ const UsersTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((user, index) => (
+                {users.map((user, index) => (
                   <tr key={user.id}>
                     <td text-label="SNo.">
                       <span className="fw-normal">{index + 1}</span>

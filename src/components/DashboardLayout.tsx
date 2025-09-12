@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { useEffect, useState } from 'react';
 import {
   FaTachometerAlt,
   FaBoxOpen,
@@ -8,19 +7,20 @@ import {
   FaTags,
   FaChevronCircleLeft,
   FaChevronCircleRight,
-} from "react-icons/fa";
-import "./index.css";
+} from 'react-icons/fa';
+import { NavLink, Outlet } from 'react-router-dom';
+import './index.css';
 
 const navLinks = [
-  { path: "/dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
+  { path: '/dashboard', label: 'Dashboard', icon: <FaTachometerAlt /> },
   {
-    path: "/dashboard/product-categories",
-    label: "Categories",
+    path: '/dashboard/product-categories',
+    label: 'Categories',
     icon: <FaTags />,
   },
-  { path: "/dashboard/products", label: "Products", icon: <FaBoxOpen /> },
-  { path: "/dashboard/orders", label: "Orders", icon: <FaClipboardList /> },
-  { path: "/dashboard/users", label: "Users", icon: <FaUsers /> },
+  { path: '/dashboard/products', label: 'Products', icon: <FaBoxOpen /> },
+  { path: '/dashboard/orders', label: 'Orders', icon: <FaClipboardList /> },
+  { path: '/dashboard/users', label: 'Users', icon: <FaUsers /> },
 ];
 
 const DashboardLayout = () => {
@@ -36,8 +36,8 @@ const DashboardLayout = () => {
       }
     };
     handleResize(); // Trigger on mount
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
@@ -45,12 +45,12 @@ const DashboardLayout = () => {
       {/* Sidebar */}
       <div
         className={`sidebar bg-dark text-white p-3 position-relative ${
-          collapsed ? "collapsed" : ""
+          collapsed ? 'collapsed' : ''
         }`}
         style={{
-          width: collapsed ? "80px" : "200px",
-          minHeight: "100vh",
-          transition: "width 0.3s",
+          width: collapsed ? '80px' : '200px',
+          minHeight: '100vh',
+          transition: 'width 0.3s',
         }}
       >
         {/* Toggle Button */}
@@ -73,8 +73,8 @@ const DashboardLayout = () => {
             alt="Logo"
             className="img-fluid"
             style={{
-              height: collapsed ? "1em" : "2em",
-              paddingLeft: collapsed ? "0" : "20px",
+              height: collapsed ? '1em' : '2em',
+              paddingLeft: collapsed ? '0' : '20px',
             }}
           />
         </NavLink>
@@ -85,7 +85,7 @@ const DashboardLayout = () => {
             <NavLink
               key={path}
               to={path}
-              end={path === "/dashboard"}
+              end={path === '/dashboard'}
               className="nav-link text-white my-1 d-flex align-items-center"
             >
               {icon}
@@ -96,10 +96,7 @@ const DashboardLayout = () => {
       </div>
 
       {/* Main Content */}
-      <main
-        className="flex-grow-1 p-3 overflow-hidden"
-        style={{ minHeight: "100vh" }}
-      >
+      <main className="flex-grow-1 p-3 overflow-hidden" style={{ minHeight: '100vh' }}>
         <Outlet />
       </main>
     </aside>

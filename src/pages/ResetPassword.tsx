@@ -58,7 +58,7 @@ const ResetPassword = () => {
         sameSite: 'Strict',
       });
 
-      dispatch(setAuth({ user }));
+      dispatch(setAuth(user));
 
       if (user.role === 'admin' || user.role === 'superAdmin') {
         navigate('/dashboard');

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import Marquee from 'react-fast-marquee';
 import { Link, useParams } from 'react-router-dom';
-import type { DetailedProduct, ProductType, Variant } from 'type';
+import type { DetailedProduct, DetailedProductResponse, ProductType, Variant } from 'type';
 
 import axios from '../axios';
 import {
@@ -16,10 +16,6 @@ import Reviews from '../components/Reviews';
 import useCart from '../hooks/useCart';
 import RatingStars from '../utils/RatingStars';
 
-interface ProductResponse {
-  status: string;
-  data: DetailedProduct;
-}
 interface SimilarProductsResponse {
   data: {
     similarProducts: ProductType[];
@@ -46,7 +42,7 @@ const Product = () => {
     queryKey: [string, string];
   }): Promise<DetailedProduct> => {
     const [_, id] = queryKey;
-    const res = await axios.get<ProductResponse>(`/products/${id}`);
+    const res = await axios.get<DetailedProductResponse>(`/products/${id}`);
     return res.data.data;
   };
   const {
@@ -172,12 +168,12 @@ const Product = () => {
           </Marquee>
         </div>
       </Row>
-      {!productLoading && (
+      {!productLoading && product && (
         <Reviews
-          productId={product?.id}
-          reviews={product?.reviews}
-          reviewsCount={product?.ratingsQuantity}
-          ratingsAverage={product?.ratingsAverage}
+          productId={product.id}
+          reviews={product.reviews}
+          reviewsCount={product.ratingsQuantity}
+          ratingsAverage={product.ratingsAverage}
           refetchProductDetail={refetchProductDetail}
         />
       )}

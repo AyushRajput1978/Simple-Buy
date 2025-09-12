@@ -45,6 +45,10 @@ export interface ProductResponse {
   data: ProductType[];
 }
 
+export interface DetailedProductResponse {
+  status: string;
+  data: DetailedProduct;
+}
 export interface DetailedProduct extends ProductType {
   reviews: Review[];
 }
@@ -66,6 +70,7 @@ export interface User {
   photo: string;
   role: string;
   _id: string;
+  id:string
 }
 
 // types/redux.ts
@@ -127,6 +132,7 @@ export interface Order {
   shippingAddress: { address: string; city: string; postalCode: string; country: string };
   status: OrderStatus;
   totalAmount: number;
+  user:{name:string,id:string}
   _id: string;
   id: string;
 }

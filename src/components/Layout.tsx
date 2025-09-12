@@ -29,7 +29,7 @@ const Layout = () => {
       const fetchData = async () => {
         try {
           const userDetails = await fetchUserDetails(authToken);
-          dispatch(setAuth({ user: userDetails }));
+          dispatch(setAuth(userDetails));
           await fetchCart();
         } catch (error) {
           console.error('Error fetching user data or cart:', error);

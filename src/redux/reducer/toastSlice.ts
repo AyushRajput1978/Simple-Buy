@@ -1,22 +1,28 @@
 // redux/slices/toastSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+
+interface toastState {
+  show: boolean;
+  message: string;
+  success: boolean;
+}
 
 const toastSlice = createSlice({
-  name: "toast",
+  name: 'toast',
   initialState: {
     show: false,
-    message: "",
+    message: '',
     success: true,
   },
   reducers: {
-    showToast: (state, action) => {
+    showToast: (state, action: PayloadAction<toastState>) => {
       state.show = true;
       state.message = action.payload.message;
       state.success = action.payload.success;
     },
     hideToast: (state) => {
       state.show = false;
-      state.message = "";
+      state.message = '';
     },
   },
 });

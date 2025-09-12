@@ -1,104 +1,102 @@
-import axios from "../../axios";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
+import type { AxiosError } from 'axios';
+import { useState } from 'react';
+import { Table, Dropdown, Card, ButtonGroup, Badge, Row } from 'react-bootstrap';
+import { BsThreeDots } from 'react-icons/bs';
+import { FaCheckCircle, FaTruck, FaBoxOpen, FaRegCheckSquare } from 'react-icons/fa';
+import { MdDelete } from 'react-icons/md';
+import type { ApiError, Order } from 'type';
 
-import { MdDelete } from "react-icons/md";
-import { BsThreeDots } from "react-icons/bs";
-import {
-  Table,
-  Dropdown,
-  Card,
-  ButtonGroup,
-  Badge,
-  Row,
-} from "react-bootstrap";
-import { useState } from "react";
-import {
-  FaCheckCircle,
-  FaTruck,
-  FaBoxOpen,
-  FaRegCheckSquare,
-} from "react-icons/fa";
-import { TableLoadingShimmer } from "../layout/LoadingShimmers";
-import { getStatusColor, getStatusLabel, toast } from "../../utils/helper";
-import ConfirmModal from "../layout/AlertModal";
+import axios from '../../axios';
+import { getStatusColor, getStatusLabel, toast } from '../../utils/helper';
+import ConfirmModal from '../layout/AlertModal';
+import { TableLoadingShimmer } from '../layout/LoadingShimmers';
+
+interface OrderResponse {
+  data: Order[];
+  status: string;
+}
 
 const statusOptions = [
   {
-    name: "Confirmed",
+    name: 'Confirmed',
     icon: <FaCheckCircle className="text-primary" />,
-    value: "confirmed",
-    color: "primary",
+    value: 'confirmed',
+    color: 'primary',
   },
   {
-    name: "Dispatched",
+    name: 'Dispatched',
     icon: <FaTruck className="text-warning" />,
-    value: "dispatched",
-    color: "warning",
+    value: 'dispatched',
+    color: 'warning',
   },
   {
-    name: "Out for delivery",
+    name: 'Out for delivery',
     icon: <FaBoxOpen className="text-info" />,
-    value: "out for delivery",
-    color: "info",
+    value: 'out for delivery',
+    color: 'info',
   },
   {
-    name: "Delivered",
+    name: 'Delivered',
     icon: <FaRegCheckSquare className="text-success" />,
-    value: "delivered",
-    color: "success",
+    value: 'delivered',
+    color: 'success',
   },
 ];
 
 const OrdersTable = () => {
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [orderId, setOrderId] = useState(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
 
-  const fetchOrders = async () => {
-    const res = await axios.get("/dashboard/orders");
+  const fetchOrders = async (): Promise<Order[]> => {
+    const res = await axios.get<OrderResponse>('/dashboard/orders');
     return res.data.data;
   };
   const {
-    data: orders,
+    data: orders = [],
     isLoading,
     refetch: refetchOrders,
   } = useQuery({
-    queryKey: ["Orders"],
+    queryKey: ['Orders'],
     queryFn: fetchOrders,
   });
 
-  const handleStatusUpdate = async (id, status) => {
+  const handleStatusUpdate = async (id: string, status: string) => {
     try {
       await axios.patch(`/dashboard/orders/${id}`, { status });
       toast(`Order status marked as "${status}" successfully`);
-      refetchOrders();
+      void refetchOrders();
     } catch (err) {
-      toast("Failed to update status", false);
+      toast('Failed to update status', false);
     }
   };
 
-  const deleteOrder = async (id) => {
+  const deleteOrder = async (id: string) => {
     setLoading(true);
     try {
       await axios.delete(`/dashboard/orders/${id}`);
-      toast("Order deleted successfully");
-      refetchOrders();
+      toast('Order deleted successfully');
+      void refetchOrders();
     } catch (err) {
-      toast(err.response.data.message || "Something went wrong", false);
+      const error = err as AxiosError<ApiError>;
+      toast(error.response?.data.message || 'Something went wrong', false);
     } finally {
       setLoading(false);
     }
   };
   const handleConfirmDeleteOrder = () => {
-    deleteOrder(orderId);
-    setShowConfirmModal(false);
-    setOrderId(null);
+    if (orderId) {
+      void deleteOrder(orderId);
+      setShowConfirmModal(false);
+      setOrderId(null);
+    }
   };
   if (isLoading || loading) {
     return <TableLoadingShimmer />;
   }
 
-  const renderDropdownItems = (order) => (
+  const renderDropdownItems = (order: Order) => (
     <>
       {statusOptions
         .filter((s) => s.value !== order.status)
@@ -128,7 +126,7 @@ const OrdersTable = () => {
       <Card.Body className="p-0 pb-4 justify-content-center">
         {orders.length > 0 ? (
           <div className="table-responsive h-50">
-            <Table hover className="user-table" style={{ minWidth: "800px" }}>
+            <Table hover className="user-table" style={{ minWidth: '800px' }}>
               <thead>
                 <tr>
                   <th>SNo.</th>
@@ -157,10 +155,9 @@ const OrdersTable = () => {
                         {getStatusLabel[order.status]}
                       </Badge>
                     </td>
-                    <td>{order.user?.name || "Guest"}</td>
+                    <td>{order.user?.name || 'Guest'}</td>
                     <td>
-                      {order.shippingAddress?.address},{" "}
-                      {order.shippingAddress?.city},{" "}
+                      {order.shippingAddress?.address}, {order.shippingAddress?.city},{' '}
                       {order.shippingAddress?.postalCode}
                     </td>
                     <td>
@@ -173,9 +170,7 @@ const OrdersTable = () => {
                           <BsThreeDots size={18} />
                         </Dropdown.Toggle>
 
-                        <Dropdown.Menu>
-                          {renderDropdownItems(order)}
-                        </Dropdown.Menu>
+                        <Dropdown.Menu>{renderDropdownItems(order)}</Dropdown.Menu>
                       </Dropdown>
                     </td>
                   </tr>

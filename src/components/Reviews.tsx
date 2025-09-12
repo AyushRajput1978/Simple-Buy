@@ -1,21 +1,31 @@
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Image,
-  Row,
-  Stack,
-} from "react-bootstrap";
-import { Fragment, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { format } from "date-fns";
+import type { AxiosError } from 'axios';
+import { format } from 'date-fns';
+import { Fragment, useEffect, useState } from 'react';
+import { Button, Card, Col, Container, Image, Row, Stack } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import type { ApiError, Review, RootState } from 'type';
 
-import AddEditReview from "./AddEditModals/AddEditReview";
-import axios from "../axios";
-import RatingStars from "../utils/RatingStars";
-import ConfirmModal from "./layout/AlertModal";
-import { toast } from "../utils/helper";
+import axios from '../axios';
+import AddEditReview from './AddEditModals/AddEditReview';
+import RatingStars from '../utils/RatingStars';
+import ConfirmModal from './layout/AlertModal';
+import { toast } from '../utils/helper';
+
+interface ReviewsProps {
+  productId: string;
+  reviews: Review[];
+  reviewsCount: number;
+  ratingsAverage: number;
+  refetchProductDetail: () => void;
+}
+
+interface ReviewInitialData {
+  product: string;
+  id: string;
+  rating: number;
+  comment: string;
+  images: string[];
+}
 
 const Reviews = ({
   productId,
@@ -23,27 +33,25 @@ const Reviews = ({
   reviewsCount,
   ratingsAverage,
   refetchProductDetail,
-}) => {
+}: ReviewsProps) => {
   const [openReviewModal, setOpenReviewModal] = useState(false);
-  const [editData, setEditData] = useState(null);
-  const [restrictAddReviewMsg, setRestrictAddReviewMsg] = useState("");
+  const [editData, setEditData] = useState<ReviewInitialData | null>(null);
+  const [restrictAddReviewMsg, setRestrictAddReviewMsg] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [reviewId, setReviewId] = useState(null);
+  const [reviewId, setReviewId] = useState('');
 
-  const userData = useSelector((state) => state.auth.user);
+  const userData = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
     if (!userData) {
-      setRestrictAddReviewMsg("Please login or signup to add a review");
+      setRestrictAddReviewMsg('Please login or signup to add a review');
     }
   }, [userData]);
   useEffect(() => {
     if (userData) {
       reviews.forEach((review) => {
         if (review.user.id === userData.id) {
-          setRestrictAddReviewMsg(
-            "You are allowed to add one review per product"
-          );
+          setRestrictAddReviewMsg('You are allowed to add one review per product');
         }
       });
     }
@@ -57,7 +65,7 @@ const Reviews = ({
     setEditData(null);
     setOpenReviewModal(true);
   };
-  const handleEditReview = (review) => {
+  const handleEditReview = (review: Review) => {
     setEditData({
       product: review.product,
       id: review.id,
@@ -67,20 +75,20 @@ const Reviews = ({
     });
     setOpenReviewModal(true);
   };
-  const deleteReview = async (id) => {
+  const deleteReview = async (id: string) => {
     try {
       await axios.delete(`/reviews/${id}`);
-      toast("Review deleted successfully");
+      toast('Review deleted successfully');
       refetchProductDetail();
     } catch (err) {
-      console.error(err);
-      toast(err.response?.data?.message || "Something went wrong", false);
+      const error = err as AxiosError<ApiError>;
+      toast(error.response?.data?.message || 'Something went wrong', false);
     }
   };
   const handleConfirmDelete = () => {
-    deleteReview(reviewId);
+    void deleteReview(reviewId);
     setShowConfirmModal(false);
-    setReviewId(null);
+    setReviewId('');
   };
 
   return (
@@ -94,23 +102,18 @@ const Reviews = ({
             <h4 className="text-secondary mb-2">What Customers Think</h4>
             <div className="d-flex justify-content-center align-items-center">
               <RatingStars ratings={ratingsAverage} reviews={true} />
-              <span className="ms-2 fw-semibold text-cta">
-                {ratingsAverage}
-              </span>
+              <span className="ms-2 fw-semibold text-cta">{ratingsAverage}</span>
             </div>
 
             <p className="text-muted mt-2">
-              Based on {reviewsCount} customer{reviewsCount !== 1 && "s"}{" "}
-              reviews
+              Based on {reviewsCount} customer{reviewsCount !== 1 && 's'} reviews
             </p>
           </Fragment>
         )}
       </div>
 
       {reviews?.length === 0 ? (
-        <p className="text-center text-muted">
-          No reviews yet. Be the first to review!
-        </p>
+        <p className="text-center text-muted">No reviews yet. Be the first to review!</p>
       ) : (
         <Row className="g-4">
           {reviews.map((review) => (
@@ -120,7 +123,7 @@ const Reviews = ({
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <RatingStars ratings={review.rating} />
                     <small className="text-muted">
-                      {format(new Date(review.createdAt), "dd MMM yyyy")}
+                      {format(new Date(review.createdAt), 'dd MMM yyyy')}
                     </small>
                   </div>
 
@@ -131,12 +134,12 @@ const Reviews = ({
                       width={45}
                       height={45}
                       className="me-3 border"
-                      style={{ objectFit: "cover" }}
+                      style={{ objectFit: 'cover' }}
                     />
                     <div className="text-start">
                       <strong className="d-block">{review.user?.name}</strong>
                       <small className="text-muted">
-                        {format(new Date(review.createdAt), "dd MMM yyyy")}
+                        {format(new Date(review.createdAt), 'dd MMM yyyy')}
                       </small>
                     </div>
                   </div>
@@ -153,8 +156,8 @@ const Reviews = ({
                             width={100}
                             height={100}
                             className="border rounded"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => window.open(image, "_blank")}
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => window.open(image, '_blank')}
                           />
                         </Col>
                       ))}

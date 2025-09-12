@@ -1,28 +1,31 @@
-import { Table, Dropdown, Card, ButtonGroup, Image } from "react-bootstrap";
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
+import { useState } from "react";
+import { Table, Dropdown, Card, ButtonGroup, Image, Row } from "react-bootstrap";
+import { BsThreeDots } from "react-icons/bs";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { BsThreeDots } from "react-icons/bs";
-import AddEditProductModal from "../AddEditModals/AddEditProductModal";
-import { TableLoadingShimmer } from "../layout/LoadingShimmers";
+import type { ApiError, DetailedProduct, DetailedProductResponse, ProductResponse, ProductType } from "type";
+
 import axios from "../../axios";
 import { toast } from "../../utils/helper";
+import AddEditProductModal from "../AddEditModals/AddEditProductModal";
 import ConfirmModal from "../layout/AlertModal";
+import { TableLoadingShimmer } from "../layout/LoadingShimmers";
 
 const ProductsTable = () => {
   const [showModal, setShowModal] = useState(false);
-  const [initialData, setInitialData] = useState(null);
+  const [initialData, setInitialData] = useState<DetailedProduct|null>(null);
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [productId, setProductId] = useState(null);
+  const [productId, setProductId] = useState("");
 
-  const fetchProducts = async () => {
-    const res = await axios.get("/dashboard/products");
+  const fetchProducts = async ():Promise<ProductType[]> => {
+    const res = await axios.get<ProductResponse>("/dashboard/products");
     return res.data.data;
   };
   const {
-    data,
+    data:products=[],
     isLoading,
     refetch: refetchProducts,
   } = useQuery({
@@ -30,20 +33,21 @@ const ProductsTable = () => {
     queryFn: fetchProducts,
   });
 
-  const handleEdit = async (id) => {
-    const res = await axios.get(`/dashboard/products/${id}`);
+  const handleEdit = async (id:string) => {
+    const res = await axios.get<DetailedProductResponse>(`/dashboard/products/${id}`);
     setInitialData(res.data.data);
     setShowModal(true);
   };
 
-  const deleteProduct = async (id) => {
+  const deleteProduct = async (id:string) => {
     setLoading(true);
     try {
       await axios.delete(`/dashboard/products/${id}`);
       toast("Product deleted successfully");
-      refetchProducts();
+      void refetchProducts();
     } catch (err) {
-      toast(err.response.data.message || "Something went wrong", false);
+      const error=err as AxiosError<ApiError>
+      toast(error.response?.data.message || "Something went wrong", false);
     } finally {
       setLoading(false);
     }
@@ -53,14 +57,14 @@ const ProductsTable = () => {
     return <TableLoadingShimmer />;
   }
   const handleConfirmDeleteProduct = () => {
-    deleteProduct(productId);
+   void deleteProduct(productId);
     setShowConfirmModal(false);
-    setProductId(null);
+    setProductId("");
   };
   return (
     <Card border="light" className="shadow-sm">
       <Card.Body className="p-0 pb-4 justify-content-center">
-        {data.length > 0 ? (
+        {products.length > 0 ? (
           <div className="table-responsive">
             <Table
               hover
@@ -78,7 +82,7 @@ const ProductsTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((prod, index) => (
+                {products.map((prod, index) => (
                   <tr key={prod.id}>
                     <td text-label="SNo.">
                       <span className="fw-normal">{index + 1}</span>
@@ -113,7 +117,7 @@ const ProductsTable = () => {
                         <Dropdown.Menu>
                           <Dropdown.Item
                             onClick={() => {
-                              handleEdit(prod.id);
+                             void handleEdit(prod.id);
                             }}
                             className="d-flex align-items-center gap-1"
                           >
@@ -148,7 +152,7 @@ const ProductsTable = () => {
         show={showModal}
         onClose={() => {
           setShowModal(false);
-          setEditId(null);
+          setInitialData(null)
         }}
         initialData={initialData}
       />

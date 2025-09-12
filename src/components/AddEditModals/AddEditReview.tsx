@@ -14,7 +14,7 @@ interface AddEditReviewProps {
   productId: string;
   show: boolean;
   onClose: () => void;
-  initialData: Review | null;
+  initialData: ReviewFormState | null;
   onUpdated: () => void;
 }
 interface ApiResponse {
@@ -27,6 +27,7 @@ type ReviewFormState = {
   rating: number;
   comment: string;
   images: (File | string)[];
+  id: string;
 };
 
 const AddEditReview = ({
@@ -37,14 +38,15 @@ const AddEditReview = ({
   onUpdated,
 }: AddEditReviewProps) => {
   const initialFormState: ReviewFormState = {
-    images: [''],
+    images: [],
     product: productId,
     rating: 0,
     comment: '',
+    id: '',
   };
   const queryClient = useQueryClient();
 
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [galleryImages, setGalleryImages] = useState<(string | File)[]>([]);
   const [formData, setFormData] = useState<ReviewFormState>(initialFormState);
 
   useEffect(() => {
